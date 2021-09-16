@@ -21,4 +21,7 @@ async def on_message(message):
     if message.content.startswith('$hello'):
         await message.channel.send('Hello!')
 
+    if message.content.startswith('$realone'):
+        await message.channel.send('Not Yash!')
+
 client.run(TOKEN)
