@@ -25,7 +25,7 @@ async def handle_command(command, args, message, bot_client):
 
     # Retrieve the command
     cmd_obj = COMMAND_HANDLERS[command]
-    if cmd_obj.params and len(args) < len(cmd_obj.params):
-        await message.channel.send(message.author.mention + " Insufficient parameters!")
+    if cmd_obj.params and len(args) != len(cmd_obj.params):
+        await message.channel.send(message.author.mention + " Incorrect number of parameters!")
     else:
         await cmd_obj.handle(args, message, bot_client)

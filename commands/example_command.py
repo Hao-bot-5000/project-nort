@@ -33,13 +33,11 @@ class Random(BaseCommand):
             lower_bound = int(params[0])
             upper_bound = int(params[1])
         except ValueError:
-            await client.send_message(message.channel,
-                                      "Please, provide valid numbers")
+            await message.channel.send("Please provide valid numbers")
             return
 
         if lower_bound > upper_bound:
-            await client.send_message(message.channel,
-                        "The lower bound can't be higher than the upper bound")
+            await message.channel.send("The lower bound can't be higher than the upper bound")
             return
 
         rolled = randint(lower_bound, upper_bound)

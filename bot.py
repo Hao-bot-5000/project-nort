@@ -69,9 +69,10 @@ def main():
     async def on_message(message):
         await common_handle_message(message)
 
-    @client.event
-    async def on_message_edit(before, after):
-        await common_handle_message(after)
+    # NOTE: enable this if we want bot to respond to edited messages
+    # @client.event
+    # async def on_message_edit(before, after):
+    #     await common_handle_message(after)
 
     # Finally, set the bot running
     client.run(settings.BOT_TOKEN)

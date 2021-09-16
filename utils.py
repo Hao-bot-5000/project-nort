@@ -43,7 +43,7 @@ def get_channel(client, value, attribute="name"):
 # Uses get_channel, so you should be sure that the bot has access to only
 # one channel with such name
 async def send_in_channel(client, channel_name, *args):
-    await client.send_message(get_channel(client, channel_name), *args)
+    await get_channel(client, channel_name).send(*args)
 
 
 # Attempts to upload a file in a certain channel
@@ -65,7 +65,6 @@ async def try_upload_file(client, channel, file_path, content=None,
         remove(file_path)
 
     if not sent_msg:
-        await client.send_message(channel,
-                                 "Oops, something happened. Please try again.")
+        await channel.send("Oops, something happened. Please try again.")
 
     return sent_msg
