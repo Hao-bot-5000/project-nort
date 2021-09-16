@@ -1,11 +1,17 @@
 import os
+from dotenv  import load_dotenv
+
+load_dotenv()
+TOKEN = os.getenv('DISCORD_TOKEN')
+
+
 
 # The prefix that will be used to parse commands.
 # It doesn't have to be a single character!
-COMMAND_PREFIX = "!"
+COMMAND_PREFIX = "!nort "
 
 # The bot token. Keep this secret!
-BOT_TOKEN = "Get this from https://discord.com/developers/applications"
+BOT_TOKEN = TOKEN
 
 # The now playing game. Set this to anything false-y ("", None) to disable it
 NOW_PLAYING = COMMAND_PREFIX + "commands"
