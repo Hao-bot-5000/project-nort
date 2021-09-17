@@ -20,12 +20,17 @@ async def handle_command(command, args, message, bot_client):
     if command not in COMMAND_HANDLERS:
         return
 
+    # Retrieve the command
+    cmd_obj = COMMAND_HANDLERS[command]
+
+    # Check if command is through DMs and whether command can be run
+    # outside of a guild
+    if not message.guild and cmd_obj.guild_only:
+        return
+
+    # Print message into console
     print(f"{message.author.name}: {settings.COMMAND_PREFIX}{command} " 
           + " ".join(args))
 
-    # Retrieve the command
-    cmd_obj = COMMAND_HANDLERS[command]
-    if cmd_obj.params and len(args) != len(cmd_obj.params):
-        await message.channel.send(message.author.mention + " Incorrect number of parameters!")
-    else:
-        await cmd_obj.handle(args, message, bot_client)
+    # Run command
+    await cmd_obj.handle(args, message, bot_client)

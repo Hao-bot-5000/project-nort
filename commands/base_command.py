@@ -4,9 +4,10 @@ import settings
 # Do not modify!
 class BaseCommand:
 
-    def __init__(self, description, params):
+    def __init__(self, description, params, guild_only=True):
         self.name = type(self).__name__.lower()
         self.params = params
+        self.guild_only = guild_only
 
         desc = f"**{settings.COMMAND_PREFIX}{self.name}**"
 
