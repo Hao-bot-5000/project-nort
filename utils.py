@@ -1,11 +1,14 @@
 from os.path    import join
 from os         import remove
 
+import json
+
 from discord    import HTTPException
 from emoji      import emojize
 
 import settings
 
+JSON_DATA_PATH = "./assets/json/data.json"
 
 # Returns a path relative to the bot directory
 def get_rel_path(rel_path):
@@ -68,3 +71,13 @@ async def try_upload_file(client, channel, file_path, content=None,
         await channel.send("Oops, something happened. Please try again.")
 
     return sent_msg
+
+# Retrieve json contents based on path URL
+async def get_json_data(path):
+    json_file = open(path, "r")
+    return json.load(json_file)
+
+# Modify json contents stored at path URL
+async def set_json_data(path, json_data):
+    json_file = open(path, "w")
+    json.dump(json_data, json_file, indent=4)

@@ -9,6 +9,8 @@ from events.base_event              import BaseEvent
 from events                         import *
 from multiprocessing                import Process
 
+from utils                          import JSON_DATA_PATH, get_json_data, set_json_data
+
 # Set to remember if the bot is already running, since on_ready may be called
 # more than once on reconnects
 this = sys.modules[__name__]
@@ -74,6 +76,24 @@ def main():
     # async def on_message_edit(before, after):
     #     await common_handle_message(after)
 
+    async def handle_guilds(guild, is_joining):
+        json_data = await get_json_data(JSON_DATA_PATH)
+        
+        if is_joining:
+            json_data[guild.id] = {}
+        else:
+            json_data.pop(guild.id, None)
+
+        await set_json_data(JSON_DATA_PATH, json_data)
+
+    @client.event
+    async def on_guild_join(guild):
+        await handle_guilds(guild, is_joining=True)
+
+    @client.event
+    async def on_guild_remove(guild):
+        await handle_guilds(guild, is_joining=False)
+        
     # Finally, set the bot running
     client.run(settings.BOT_TOKEN)
 
