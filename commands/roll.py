@@ -14,10 +14,10 @@ class Roll(BaseCommand):
 
         try:
             if num_params == 0:
-                lower = 0
+                lower = 1
                 upper = 100
             elif num_params == 1:
-                lower = 0
+                lower = 1
                 upper = int(params[0])
             elif num_params == 2:
                 lower = int(params[0])
@@ -29,8 +29,11 @@ class Roll(BaseCommand):
             await message.channel.send("Please provide valid numbers")
             return
         
+        if lower < 1:
+            await message.channel.send("The values must be greater than 0")
+
         if lower > upper:
-            await message.channel.send("The lower bound can't be higher than the upper bound")
+            await message.channel.send("The lower bound cannot be higher than the upper bound")
             return
 
         value = randint(lower, upper)
