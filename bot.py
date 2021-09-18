@@ -19,13 +19,16 @@ this.running = False
 # Scheduler that will be used to manage events
 sched = AsyncIOScheduler()
 
+# Setting up intents
+intents = discord.Intents.default()
+intents.members = True
 
 ###############################################################################
 
 def main():
     # Initialize the client
     print("Starting up...")
-    client = discord.Client()
+    client = discord.Client(intents=intents)
 
     # Define event handlers for the client
     # on_ready may be called multiple times in the event of a reconnect,
