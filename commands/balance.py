@@ -1,7 +1,7 @@
 from discord                import Color, Embed
 
 from commands.base_command  import BaseCommand
-from utils                  import get_emoji, JSON_DATA_PATH, get_json_data, set_json_data
+from utils                  import get_emoji, JSON_DATA_PATH, get_json_data, get_mentioned_member
 
 class Balance(BaseCommand):
 
@@ -23,23 +23,23 @@ class Balance(BaseCommand):
         if num_params == 0:
             member = message.author
         elif num_params == 1:
-            target = params[0]
-            member = message.mentions[0] if message.mentions else guild.get_member_named(target)
-            if not member:
-                try:
-                    member = await guild.get_member(int(target))
-                except Exception:
-                    await message.channel.send(f"Member {target} could not be found")
-                    return
+            member = await get_mentioned_member(message, backup=params[0])
         else:
             await message.channel.send("Too many arguments")
+            return
+        
+        if member is None:
+            await message.channel.send(f"Member {params[0]} could not be found")
             return
 
         member_id = str(member.id)
         member_data = yc_members_data.get(member_id, None) if yc_members_data else None
 
         if member_data is None:
-            await message.channel.send(f"{member.display_name} is not a member of YashCoin" + get_emoji(":tm:") + " Incorporated")
+            await message.channel.send(
+                f"{member.display_name} is not a member of YashCoin" + 
+                get_emoji(":tm:") + " Incorporated"
+            )
             return
 
         nortcoins = member_data.get("yashcoins", 0)
