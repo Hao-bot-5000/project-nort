@@ -2,13 +2,12 @@ from os.path    import join
 from os         import remove
 
 import json
+import math
 
 from discord    import HTTPException
 from emoji      import emojize
 
 import settings
-
-JSON_DATA_PATH = "./assets/json/data.json"
 
 # Returns a path relative to the bot directory
 def get_rel_path(rel_path):
@@ -72,6 +71,11 @@ async def try_upload_file(client, channel, file_path, content=None,
 
     return sent_msg
 
+
+
+### JSON Helpers ###
+JSON_DATA_PATH = "./assets/json/data.json"
+
 # Retrieve json contents based on path URL
 async def get_json_data(path):
     json_file = open(path, "r")
@@ -81,3 +85,33 @@ async def get_json_data(path):
 async def set_json_data(path, json_data):
     json_file = open(path, "w")
     json.dump(json_data, json_file, indent=4)
+
+
+
+### Member Searching Helpers ###
+# Attempts to retrieve a member based on the message's mention
+# If no member is mentioned in the message, run a name-based and 
+# id-based search to retrieve the member
+# If the member cannot be found, returns None
+async def get_mentioned_member(message, backup):
+    guild = message.guild
+    mentions = message.mentions
+
+    member = mentions[0] if mentions else guild.get_member_named(backup)
+    if not member:
+        try:
+            member = await guild.get_member(int(backup))
+        except Exception:
+            pass
+    
+    return member
+
+
+
+### ETC ###
+NUM_BARS = 25
+async def create_progress_bar(percentage):
+    percentage = min(1, max(0, percentage))
+
+    bars = "#" * math.floor(percentage * NUM_BARS) + "-" * math.ceil((1 - percentage) * NUM_BARS)
+    return f"`{int(percentage * 100)}% [{bars}]`"
