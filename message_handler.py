@@ -18,6 +18,10 @@ async def handle_command(command, args, message, bot_client):
     # (to prevent unnecesary spam if our bot shares the same command prefix 
     # with some other bot)
     if command not in COMMAND_HANDLERS:
+        await message.channel.send(
+            f"That command does not exist. For more information, please run " +
+            f"`{settings.COMMAND_PREFIX}commands`"
+        )
         return
 
     # Retrieve the command
@@ -29,8 +33,10 @@ async def handle_command(command, args, message, bot_client):
         return
 
     # Print message into console
-    print(f"{message.author.name}: {settings.COMMAND_PREFIX}{command} " 
-          + " ".join(args))
+    print(
+        f"{message.author.name}: {settings.COMMAND_PREFIX}{command} " + 
+        " ".join(args)
+    )
 
     # Run command
     await cmd_obj.handle(args, message, bot_client)
