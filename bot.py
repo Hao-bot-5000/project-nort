@@ -5,8 +5,6 @@ import discord
 import message_handler
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from events.base_event              import BaseEvent
-from events                         import *
 from multiprocessing                import Process
 
 from utils                          import JSON_DATA_PATH, get_json_data, set_json_data
@@ -46,17 +44,6 @@ def main():
             await client.change_presence(
                 activity=discord.Game(name=settings.NOW_PLAYING))
         print("Logged in!", flush=True)
-
-        # Load all events
-        print("Loading events...", flush=True)
-        n_ev = 0
-        for ev in BaseEvent.__subclasses__():
-            event = ev()
-            sched.add_job(event.run, 'interval', (client,), 
-                          minutes=event.interval_minutes)
-            n_ev += 1
-        sched.start()
-        print(f"{n_ev} events loaded", flush=True)
 
     # The message handler for both new message and edits
     async def common_handle_message(message):
