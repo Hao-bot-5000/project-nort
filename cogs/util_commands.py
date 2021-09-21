@@ -15,7 +15,7 @@ class UtilCommands(BaseCommand):
     async def cmds(self, ctx):
         msg = f"{ctx.author.mention}\n"
 
-        await ctx.send(msg, "WIP -- use the default `!nort help` for now")
+        await ctx.send(msg + "WIP -- use the default `!nort help` for now")
     
 def setup(bot):
     bot.add_cog(UtilCommands(bot)) 
