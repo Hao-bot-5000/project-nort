@@ -2,7 +2,10 @@ import sys
 
 import settings
 import discord
-import message_handler
+from discord.ext                    import commands
+
+from cogs                           import *
+from cogs.base_command              import BaseCommand
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from multiprocessing                import Process
@@ -21,17 +24,26 @@ sched = AsyncIOScheduler()
 intents = discord.Intents.default()
 intents.members = True
 
+# Register all available cogs
+# TODO: dynamically store all cog files in a list
+COGS = ["cogs.rng_commands", "cogs.util_commands", "cogs.yashcoin_commands"]
+
 ###############################################################################
 
 def main():
-    # Initialize the client
+    # Initialize the bot
     print("Starting up...")
-    client = discord.Client(intents=intents)
+    bot = commands.Bot(intents=intents, command_prefix=settings.COMMAND_PREFIX)
 
-    # Define event handlers for the client
+    # Load up all available cogs
+    print(f"List of cogs: {COGS}")
+    for cog in COGS:
+        bot.load_extension(cog)
+
+    # Define event handlers for the bot
     # on_ready may be called multiple times in the event of a reconnect,
     # hence the running flag
-    @client.event
+    @bot.event
     async def on_ready():
         if this.running:
             return
@@ -41,30 +53,23 @@ def main():
         # Set the playing status
         if settings.NOW_PLAYING:
             print("Setting NP game", flush=True)
-            await client.change_presence(
-                activity=discord.Game(name=settings.NOW_PLAYING))
+            await bot.change_presence(
+                  activity=discord.Game(name=settings.NOW_PLAYING))
         print("Logged in!", flush=True)
-
-    # The message handler for both new message and edits
-    async def common_handle_message(message):
-        text = message.content
-        if text.startswith(settings.COMMAND_PREFIX) and text != settings.COMMAND_PREFIX:
-            cmd_split = text[len(settings.COMMAND_PREFIX):].split()
-            try:
-                await message_handler.handle_command(cmd_split[0].lower(), 
-                                      cmd_split[1:], message, client)
-            except:
-                print("Error while handling message", flush=True)
-                raise
-
-    @client.event
-    async def on_message(message):
-        await common_handle_message(message)
-
-    # NOTE: enable this if we want bot to respond to edited messages
-    # @client.event
-    # async def on_message_edit(before, after):
-    #     await common_handle_message(after)
+    
+    @bot.before_invoke
+    async def print_command_in_console(ctx):
+        print(f"{ctx.author.name}: {ctx.message.content}")
+    
+    @bot.event
+    async def on_command_error(ctx, error):
+        if isinstance(error, commands.CommandNotFound): 
+            await ctx.send(
+                f"That command does not exist. For more information, please run " +
+                f"`{bot.command_prefix}help`"
+            )
+        else:
+            raise error
 
     async def handle_guilds(guild, is_joining):
         json_data = await get_json_data(JSON_DATA_PATH)
@@ -76,16 +81,16 @@ def main():
 
         await set_json_data(JSON_DATA_PATH, json_data)
 
-    @client.event
+    @bot.event
     async def on_guild_join(guild):
         await handle_guilds(guild, is_joining=True)
 
-    @client.event
+    @bot.event
     async def on_guild_remove(guild):
         await handle_guilds(guild, is_joining=False)
         
     # Finally, set the bot running
-    client.run(settings.BOT_TOKEN)
+    bot.run(settings.BOT_TOKEN)
 
 ###############################################################################
 
