@@ -13,7 +13,7 @@ class RngCommands(BaseCommand):
     @commands.command(
         name="roll", 
         brief="Generates random number", 
-        description="Generates a random number between two given numbers"
+        description="Generates a random number between 1 and the given number"
     )
     @commands.guild_only()
     async def roll(self, ctx, *args):
@@ -21,30 +21,21 @@ class RngCommands(BaseCommand):
 
         try:
             if num_params == 0:
-                lower = 1
-                upper = 100
+                value = 100
             elif num_params == 1:
-                lower = 1
-                upper = int(args[0])
-            elif num_params == 2:
-                lower = int(args[0])
-                upper = int(args[1])
+                value = int(args[0])
             else:
                 await ctx.send("Too many arguments")
                 return
         except ValueError:
-            await ctx.send("Please provide valid numbers")
+            await ctx.send("Please provide a valid number")
             return
         
-        if lower < 1:
-            await ctx.send("The values must be greater than 0")
+        if value < 1:
+            await ctx.send("The value must be greater than 0")
 
-        if lower > upper:
-            await ctx.send("The lower bound cannot be higher than the upper bound")
-            return
-
-        value = randint(lower, upper)
-        reply = f"{get_emoji(':game_die:')} You rolled **{value}** out of **{upper}**!"
+        roll = randint(1, value)
+        reply = f"{get_emoji(':game_die:')} You rolled **{roll}** out of **{value}**!"
 
         await ctx.send(reply)
     
