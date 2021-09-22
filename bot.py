@@ -33,7 +33,8 @@ COGS = ["cogs.rng_commands", "cogs.util_commands", "cogs.yashcoin_commands"]
 def main():
     # Initialize the bot
     print("Starting up...")
-    bot = commands.Bot(intents=intents, command_prefix=settings.COMMAND_PREFIX)
+    bot = commands.Bot(intents=intents, command_prefix=settings.COMMAND_PREFIX, 
+                       help_command=None)
 
     # Load up all available cogs
     print(f"List of cogs: {COGS}")
