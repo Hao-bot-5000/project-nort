@@ -18,7 +18,11 @@ class YashCoinCommands(BaseCommand):
         description="Adds yourself to the YashCoin event"
     )
     @commands.guild_only()
-    async def initiate(self, ctx):
+    async def initiate(self, ctx, *args):
+        if len(args) > 0:
+            await ctx.send("Too many arguments")
+            return
+
         guild_id = str(ctx.guild.id)
         author_id = str(ctx.author.id)
 
@@ -52,8 +56,8 @@ class YashCoinCommands(BaseCommand):
         description="Displays the member's current balance"
     )
     @commands.guild_only()
-    async def balance(self, ctx, *args):
-        member = await self.__get_yc_member(ctx, args)
+    async def balance(self, ctx, member=None, *args):
+        member = await self.__get_yc_member(ctx, member if member else ctx.author, args)
 
         if member is None:
             return # Error messages are handled inside the private func
@@ -81,8 +85,8 @@ class YashCoinCommands(BaseCommand):
         description="Displays the member's cringe meter"
     )
     @commands.guild_only()
-    async def cringemeter(self, ctx, *args):
-        member = await self.__get_yc_member(ctx, args)
+    async def cringemeter(self, ctx, member=None, *args):
+        member = await self.__get_yc_member(ctx, member if member else ctx.author, args)
 
         if member is None:
             return # Error messages are handled inside the private func
@@ -99,8 +103,11 @@ class YashCoinCommands(BaseCommand):
     # Returns None if member cannot be found in the guild
     # Returns None if member is found in the guild, but not in the JSON file
     # Returns a dict containing the member's data and display name if member is found
-    async def __get_yc_member(self, ctx, args):
-        num_params = len(args)
+    async def __get_yc_member(self, ctx, member, args):
+        if len(args) > 0:
+            await ctx.send("Too many arguments")
+            return None
+
         guild = ctx.guild
         guild_id = str(guild.id)
 
@@ -109,17 +116,13 @@ class YashCoinCommands(BaseCommand):
         guild_data = json_data.get(guild_id, None)
         yc_members_data = guild_data.get("yc_members", None) if guild_data else None
 
-        if num_params == 0:
-            member = ctx.author
-        elif num_params == 1:
-            member = await get_mentioned_member(ctx.message, backup=args[0])
-        else:
-            await ctx.send("Too many arguments")
-            return None
-        
-        if member is None:
-            await ctx.send(f"Member {args[0]} could not be found")
-            return None
+        if member != ctx.author:
+            result = await get_mentioned_member(ctx.message, backup=member)
+            if result is None:
+                await ctx.send(f"Member {member} could not be found")
+                return None
+            else:
+                member = result
 
         member_id = str(member.id)
         member_data = yc_members_data.get(member_id, None) if yc_members_data else None

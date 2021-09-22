@@ -16,23 +16,22 @@ class RngCommands(BaseCommand):
         description="Generates a random number between 1 and the given number"
     )
     @commands.guild_only()
-    async def roll(self, ctx, *args):
-        num_params = len(args)
-
-        try:
-            if num_params == 0:
-                value = 100
-            elif num_params == 1:
-                value = int(args[0])
-            else:
-                await ctx.send("Too many arguments")
-                return
-        except ValueError:
-            await ctx.send("Please provide a valid number")
+    async def roll(self, ctx, value=None, *args):
+        if len(args) > 0:
+            await ctx.send("Too many arguments")
             return
-        
-        if value < 1:
-            await ctx.send("The value must be greater than 0")
+
+        if value is None:
+            value = 100
+        else:
+            try:
+                value = int(value)
+                if value < 1:
+                    await ctx.send("The value must be greater than 0")
+                    return
+            except ValueError:
+                await ctx.send("Please provide a valid number")
+                return
 
         roll = randint(1, value)
         reply = f"{get_emoji(':game_die:')} You rolled **{roll}** out of **{value}**!"
