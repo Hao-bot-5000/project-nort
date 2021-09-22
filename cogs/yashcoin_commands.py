@@ -126,8 +126,8 @@ class YashCoinCommands(BaseCommand):
 
         if member_data is None:
             await ctx.send(
-                f"{member.display_name} is not a member of YashCoin" + 
-                f"{get_emoji(':tm:')} Incorporated"
+                (f"{member.display_name} is " if member != ctx.author else "You are ") + 
+                f"not a member of YashCoin{get_emoji(':tm:')} Incorporated"
             )
             return None
         
