@@ -110,7 +110,8 @@ async def get_mentioned_member(message, backup):
 
 ### ETC ###
 NUM_BARS = 25
-async def create_progress_bar(percentage):
+
+def create_progress_bar(percentage):
     percentage = min(1, max(0, percentage))
 
     bars = "\u25ae" * math.floor(percentage * NUM_BARS) + "." * math.ceil((1 - percentage) * NUM_BARS)
