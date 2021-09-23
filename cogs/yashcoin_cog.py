@@ -1,15 +1,14 @@
 import discord
 from discord.ext        import commands
 
-from cogs.base_command  import BaseCommand
+from cogs.base_cog      import BaseCog
 
 from utils              import (JSON_DATA_PATH, get_json_data, set_json_data, 
                                 get_emoji, get_mentioned_member, create_progress_bar)
 
-
-class YashCoinCommands(BaseCommand):
+class YashCoinCog(BaseCog):
     def __init__(self, bot):
-        super().__init__(bot)
+        super().__init__(bot, category="YashCoin")
     
     ### Initiate command ###
     @commands.command(
@@ -92,7 +91,7 @@ class YashCoinCommands(BaseCommand):
             return # Error messages are handled inside the private func
 
         cringe_meter_value = member.get("data", { "cringe_meter" : 0 }).get("cringe_meter")
-        cringe_meter_display = await create_progress_bar(cringe_meter_value)
+        cringe_meter_display = create_progress_bar(cringe_meter_value)
         reply = f"{cringe_meter_display}"
 
         await ctx.send(reply)
@@ -138,4 +137,4 @@ class YashCoinCommands(BaseCommand):
 
 
 def setup(bot):
-    bot.add_cog(YashCoinCommands(bot)) 
+    bot.add_cog(YashCoinCog(bot)) 
