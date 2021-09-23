@@ -112,7 +112,15 @@ async def get_mentioned_member(message, backup):
 NUM_BARS = 25
 
 def create_progress_bar(percentage):
-    percentage = min(1, max(0, percentage))
+    if not isinstance(percentage, (int, float)):
+        raise TypeError("input must be a number")
 
-    bars = "\u25ae" * math.floor(percentage * NUM_BARS) + "." * math.ceil((1 - percentage) * NUM_BARS)
-    return f"`{int(percentage * 100)}% [{bars}]`"
+    percentage = min(1, max(0, percentage))
+    percent_display = int(percentage * 100)
+    # Added safety check for when percent_display=0, since logN(0) is undefined
+    percent_display_len = int(math.log10(max(1, percent_display))) + 1
+    print(percent_display_len)
+    padding = " " * (3 - percent_display_len)
+
+    bars = "\u25a0" * math.floor(percentage * NUM_BARS) + " " * math.ceil((1 - percentage) * NUM_BARS)
+    return f"`{percent_display}% {padding}[{bars}]`"
