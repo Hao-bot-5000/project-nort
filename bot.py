@@ -1,11 +1,9 @@
+import os
 import sys
 
 import settings
 import discord
 from discord.ext                    import commands
-
-from cogs                           import *
-from cogs.base_command              import BaseCommand
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from multiprocessing                import Process
@@ -25,8 +23,8 @@ intents = discord.Intents.default()
 intents.members = True
 
 # Register all available cogs
-# TODO: dynamically store all cog files in a list
-COGS = ["cogs.rng_commands", "cogs.util_commands", "cogs.yashcoin_commands"]
+COGS = [f"cogs.{filename[:-3]}" for filename in os.listdir("./cogs")
+        if filename.endswith(".py") and filename != "base_cog.py"]
 
 ###############################################################################
 
