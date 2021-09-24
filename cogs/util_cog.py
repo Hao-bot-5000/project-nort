@@ -25,32 +25,33 @@ class UtilCog(BaseCog):
         if command is None:
             reply = f"{ctx.author.mention}\n"
 
-            cmds = list(self.bot.commands)
-            cmds.sort(key=lambda cmd: cmd.name)
-            for cmd in cmds:
-                reply += f"\n**{self.bot.command_prefix}{cmd.name}**: {cmd.brief}"
-            
+            for cog in self.bot.cogs.values():
+                reply += f"\n**{cog.category}**:"
+                reply += self.__command_list_to_string(cog.get_commands())
+
             reply += (
                 f"\n\nRun `{self.bot.command_prefix}help <command>` " + 
-                "for more information on a command"
+                "for more information on a command" + 
+
+                f"\nYou can also run `{self.bot.command_prefix}help <category>` " + 
+                "for more information on a category" 
             )
         else:
-            cmd = self.bot.get_command(command)
+            res = await self.__get_command_or_cog(ctx, command)
 
-            if cmd is None:
-                await ctx.send(
-                    f"No command called '{command}' found; run " + 
-                    f"`{self.bot.command_prefix}help` for the list of all " + 
-                    "available commands"
-                )
+            if res is None:
                 return
-            
-            reply = f"{ctx.author.mention}\n\n**{self.bot.command_prefix}{cmd.name}**"
 
-            for param in list(cmd.clean_params.keys())[:-1]:
-                reply += f" *<{param}>*"
+            if isinstance(res, commands.Command):
+                reply = f"{ctx.author.mention}\n\n`{self.bot.command_prefix}{res.name}"
 
-            reply += f": {cmd.description}"
+                for param in list(res.clean_params.keys())[:-1]:
+                    reply += f" <{param}>"
+
+                reply += f"`: {res.description}"
+            else:
+                reply = f"{ctx.author.mention}\n\n**{res.category}**:"
+                reply += self.__command_list_to_string(res.get_commands())
 
         await ctx.send(reply)
     
@@ -82,6 +83,29 @@ class UtilCog(BaseCog):
         reply = f"{get_emoji(':game_die:')} You rolled **{roll}** out of **{value}**!"
 
         await ctx.send(reply)
+
+
+
+    ### Private methods ###
+    async def __get_command_or_cog(self, ctx, name):
+        cmd = self.bot.get_command(name)
+        if cmd is None:
+            cog = next((c for c in self.bot.cogs.values() if c.category == name), None)
+            if cog is None:
+                await ctx.send(
+                    f"No command or category called '{name}' found; run " + 
+                    f"`{self.bot.command_prefix}help` for the list of all " + 
+                    "available commands and categories"
+                )
+                return None
+            
+            return cog
+
+        return cmd
     
+    def __command_list_to_string(self, cmds):
+        return "".join([f"\n\t`{self.bot.command_prefix}{cmd.name}`: {cmd.brief}" 
+                        for cmd in cmds])
+
 def setup(bot):
     bot.add_cog(UtilCog(bot)) 
