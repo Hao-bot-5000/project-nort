@@ -61,8 +61,8 @@ class YashCoinCog(BaseCog):
         if member is None:
             return # Error messages are handled inside the private func
 
-        nortcoins = member.get("data", { "nort_coins" : 0 }).get("nort_coins")
-        yashcoins = member.get("data", { "yash_coins" : 0 }).get("yash_coins")
+        nortcoins = member.get("data", {}).get("nort_coins", 0)
+        yashcoins = member.get("data", {}).get("yash_coins", 0)
 
         balance_description = (
             f"{get_emoji(':coin:')} `NortCoins: {nortcoins}`\n" + 
@@ -90,7 +90,7 @@ class YashCoinCog(BaseCog):
         if member is None:
             return # Error messages are handled inside the private func
 
-        cringe_meter_value = member.get("data", { "cringe_meter" : 0 }).get("cringe_meter")
+        cringe_meter_value = member.get("data", {}).get("cringe_meter", 0)
         cringe_meter_display = create_progress_bar(cringe_meter_value)
         reply = f"{cringe_meter_display}"
 
