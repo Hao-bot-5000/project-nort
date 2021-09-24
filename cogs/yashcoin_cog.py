@@ -107,8 +107,7 @@ class YashCoinCog(BaseCog):
             await ctx.send("Too many arguments")
             return None
 
-        guild = ctx.guild
-        guild_id = str(guild.id)
+        guild_id = str(ctx.guild.id)
 
         # Retrieve json contents
         json_data = await get_json_data(JSON_DATA_PATH)
