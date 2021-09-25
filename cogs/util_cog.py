@@ -12,7 +12,6 @@ class UtilCog(BaseCog):
     
     ### Help Command ###
     @commands.command(
-        name="help", 
         brief="Displays commands",
         description="Displays all available commands offered by this bot"
     )
@@ -57,7 +56,6 @@ class UtilCog(BaseCog):
     
     ### Random Number Generator Command ###
     @commands.command(
-        name="roll", 
         brief="Generates random number", 
         description="Generates a random number between 1 and the given number"
     )

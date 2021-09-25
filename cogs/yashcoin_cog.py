@@ -12,7 +12,7 @@ class YashCoinCog(BaseCog):
     
     ### Initiate command ###
     @commands.command(
-        name="initiate", 
+        aliases=["init", "join"], 
         brief="Enters YashCoin event", 
         description="Adds yourself to the YashCoin event"
     )
@@ -50,7 +50,7 @@ class YashCoinCog(BaseCog):
 
     ### Balance command ###
     @commands.command(
-        name="balance", 
+        aliases=["bal"], 
         brief="Displays balance", 
         description="Displays the member's current balance"
     )
@@ -79,7 +79,7 @@ class YashCoinCog(BaseCog):
 
     ### CM Command ###
     @commands.command(
-        name="cringemeter", 
+        aliases=["cm"], 
         brief="Displays cringe meter", 
         description="Displays the member's cringe meter"
     )
