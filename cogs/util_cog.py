@@ -71,7 +71,7 @@ class UtilCog(BaseCog):
             sample_member = ctx.guild.owner.display_name
             await ctx.send(
                 f"Please input a message to vote on — for example: " + 
-                f"`{self.bot.command_prefix}poll \"Is {sample_member} a real one?\"`"
+                f"`{self.bot.command_prefix}poll Is {sample_member} a real one?`"
             )
             return
         
