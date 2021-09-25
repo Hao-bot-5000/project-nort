@@ -53,7 +53,34 @@ class UtilCog(BaseCog):
                 reply += self.__command_list_to_string(res.get_commands())
 
         await ctx.send(reply)
-    
+
+    ### Poll Command ###
+    @commands.command(
+        brief="Generates poll", 
+        description="Generates a reaction-based poll based around the given message"
+    )
+    @commands.guild_only()
+    # NOTE: unused 'args' variable acts as filler so that the 
+    #       'help' command does not cut off the 'message' variable
+    async def poll(self, ctx, *, message=None, args=None):
+        if args is not None: # NOTE: this should never happen
+            await ctx.send("This should have been impossible?!?!!")
+            return
+
+        if message is None:
+            sample_member = ctx.guild.owner.display_name
+            await ctx.send(
+                f"Please input a message to vote on — for example: " + 
+                f"`{self.bot.command_prefix}poll \"Is {sample_member} a real one?\"`"
+            )
+            return
+        
+        reply = f"Poll by **{ctx.author.display_name}**:\n\t`{message}`"
+
+        message = await ctx.send(reply)
+        await message.add_reaction(get_emoji(":thumbs_up:"))
+        await message.add_reaction(get_emoji(":thumbs_down:"))
+
     ### Random Number Generator Command ###
     @commands.command(
         brief="Generates random number", 
