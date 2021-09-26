@@ -166,7 +166,7 @@ class YashCoinCog(BaseCog):
             "icon" : member.avatar_url 
         }
     
-    __CRINGE_STATUSES = ["Not Cringe", "Kinda Cringe", "Cringe", "Ultra Cringe", "YASH"]
+    __CRINGE_STATUSES = ("Not Cringe", "Kinda Cringe", "Cringe", "Ultra Cringe", "YASH")
     def __get_cringe_status(self, percent):
         if percent == 0.69: return "Nice"
         return self.__CRINGE_STATUSES[int(percent * (len(self.__CRINGE_STATUSES) - 1))]
