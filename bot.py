@@ -1,6 +1,8 @@
 import os
 import sys
 
+from discord.ext.commands.errors import ArgumentParsingError
+
 import settings
 import discord
 from discord.ext                    import commands
@@ -67,6 +69,12 @@ def main():
                 f"That command does not exist. For more information, please run " +
                 f"`{bot.command_prefix}help`"
             )
+        elif isinstance(error, ArgumentParsingError):
+            await ctx.send(
+                f"You have entered an invalid argument. Please make sure that " + 
+                "your arguments are properly formatted for this command"
+            )
+            print(error) # in case it isn't just an issue with improper quotation marks
         else:
             raise error
 
