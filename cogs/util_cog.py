@@ -4,7 +4,7 @@ from discord.ext        import commands
 from cogs.base_cog      import BaseCog
 
 from random             import randint
-from utils              import get_emoji
+from utils              import get_emoji, create_black_embed
 
 class UtilCog(BaseCog):
     def __init__(self, bot):
@@ -57,29 +57,37 @@ class UtilCog(BaseCog):
     ### Poll Command ###
     @commands.command(
         brief="Generates poll", 
-        description="Generates a reaction-based poll based around the given message"
+        description="Generates a poll that members can participate in "
+                    "by reacting to the given options (maximum of 10)"
     )
     @commands.guild_only()
     # NOTE: unused 'args' variable acts as filler so that the 
     #       'help' command does not cut off the 'message' variable
-    async def poll(self, ctx, *, message=None, args=None):
-        if args is not None: # NOTE: this should never happen
-            await ctx.send("This should have been impossible?!?!!")
+    async def poll(self, ctx, message=None, *options, args=None):
+        num_options = len(options)
+
+        if num_options > 10:
+            await ctx.send("Too many arguments")
             return
 
         if message is None:
             sample_member = ctx.guild.owner.display_name
             await ctx.send(
                 f"Please input a message to vote on — for example: " + 
-                f"`{self.bot.command_prefix}poll Is {sample_member} a real one?`"
+                f"`{self.bot.command_prefix}poll \"Is {sample_member} a real one?\" " + 
+                "yes no`"
             )
             return
         
-        reply = f"Poll by **{ctx.author.display_name}**:\n\t`{message}`"
+        embed_reply = create_black_embed()
 
-        message = await ctx.send(reply)
-        await message.add_reaction(get_emoji(":thumbs_up:"))
-        await message.add_reaction(get_emoji(":thumbs_down:"))
+        embed_reply.set_author(
+            name=f"Poll by {ctx.author.display_name}:", 
+            icon_url=ctx.author.avatar_url
+        )
+        
+        self.__add_poll_options(message, embed_reply, options, num_options)
+        await self.__add_poll_reactions(await ctx.send(embed=embed_reply), num_options)
 
     ### Random Number Generator Command ###
     @commands.command(
@@ -131,6 +139,31 @@ class UtilCog(BaseCog):
     def __command_list_to_string(self, cmds):
         return "".join([f"\n\t`{self.bot.command_prefix}{cmd.name}`: {cmd.brief}" 
                         for cmd in cmds])
+    
+    __POLL_EMOJIS = (get_emoji(":one:"),   get_emoji(":two:"),   get_emoji(":three:"), 
+                     get_emoji(":four:"),  get_emoji(":five:"),  get_emoji(":six:"), 
+                     get_emoji(":seven:"), get_emoji(":eight:"), get_emoji(":nine:"), 
+                     get_emoji(":ten:"))
+    def __add_poll_options(self, message, embed, options, num_options):
+        if num_options == 0:
+            options = ("Yes", "No")
+            emojis = (get_emoji(":thumbs_up:"), get_emoji(":thumbs_down:"))
+        else:
+            emojis = self.__POLL_EMOJIS[:num_options]
+
+        embed.add_field(
+            name=" " + message, 
+            value='\n'.join(f"{e} `{o}`" for e, o in zip(emojis, options)), 
+        )
+
+    async def __add_poll_reactions(self, message, num_options):
+        if num_options == 0:
+            await message.add_reaction(get_emoji(":thumbs_up:"))
+            await message.add_reaction(get_emoji(":thumbs_down:"))
+            return
+
+        for i in range(num_options):
+            await message.add_reaction(self.__POLL_EMOJIS[i])
 
 def setup(bot):
     bot.add_cog(UtilCog(bot)) 
