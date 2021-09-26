@@ -4,7 +4,8 @@ from discord.ext        import commands
 from cogs.base_cog      import BaseCog
 
 from utils              import (JSON_DATA_PATH, get_json_data, set_json_data, 
-                                get_emoji, get_mentioned_member, create_progress_bar)
+                                get_emoji, get_mentioned_member, create_progress_bar, 
+                                create_black_embed)
 
 class YashCoinCog(BaseCog):
     def __init__(self, bot):
@@ -64,15 +65,23 @@ class YashCoinCog(BaseCog):
         nortcoins = member.get("data", {}).get("nort_coins", 0)
         yashcoins = member.get("data", {}).get("yash_coins", 0)
 
-        balance_description = (
-            f"{get_emoji(':coin:')} `NortCoins: {nortcoins}`\n" + 
-            f"{get_emoji(':moneybag:')} `YashCoins: {yashcoins}`"
-        )
+        embed_reply = create_black_embed()
 
-        embed_reply = discord.Embed(
-            color=discord.Color.green(),
-            title=f"{member.get('display_name', 'Member')}'s Balance:",
-            description=balance_description
+        embed_reply.set_author(
+            name=f"{member.get('display_name', 'Member')}'s Balance:", 
+            icon_url=member.get("icon", None)
+        )
+        embed_reply.add_field(
+            name="\u200b", 
+            value=(f"{get_emoji(':moneybag:')} **YashCoins**\n" + 
+                   f"{get_emoji(':coin:')} **NortCoins**"), 
+            inline=True
+        )
+        embed_reply.add_field(
+            name="\u200b", 
+            value=(f"`{yashcoins}`\n" + 
+                   f"`{nortcoins}`"), 
+            inline=True
         )
 
         await ctx.send(embed=embed_reply)
@@ -91,10 +100,29 @@ class YashCoinCog(BaseCog):
             return # Error messages are handled inside the private func
 
         cringe_meter_value = member.get("data", {}).get("cringe_meter", 0)
-        cringe_meter_display = create_progress_bar(cringe_meter_value)
-        reply = f"{cringe_meter_display}"
+        cringe_meter_status = self.__get_cringe_status(cringe_meter_value)
+        cringe_meter_bar = create_progress_bar(cringe_meter_value)
 
-        await ctx.send(reply)
+        embed_reply = create_black_embed()
+
+        embed_reply.set_author(
+            name=f"{member.get('display_name', 'Member')}'s Cringe Meter:", 
+            icon_url=member.get("icon", None)
+        )
+        embed_reply.add_field(
+            name="\u200b", 
+            value=("**Status**\n" + 
+                   f"**{cringe_meter_bar[0]}%**"), 
+            inline=True
+        )
+        embed_reply.add_field(
+            name="\u200b", 
+            value=(f"`{cringe_meter_status}`\n" + 
+                   f"`{cringe_meter_bar[1]}`"), 
+            inline=True
+        )
+
+        await ctx.send(embed=embed_reply)
 
 
 
@@ -132,7 +160,16 @@ class YashCoinCog(BaseCog):
             )
             return None
         
-        return { "data" : member_data, "display_name" : member.display_name }
+        return {
+            "data" : member_data, 
+            "display_name" : member.display_name, 
+            "icon" : member.avatar_url 
+        }
+    
+    __CRINGE_STATUSES = ["Not Cringe", "Kinda Cringe", "Cringe", "Ultra Cringe", "YASH"]
+    def __get_cringe_status(self, percent):
+        if percent == 0.69: return "Nice"
+        return self.__CRINGE_STATUSES[int(percent * (len(self.__CRINGE_STATUSES) - 1))]
 
 
 def setup(bot):
