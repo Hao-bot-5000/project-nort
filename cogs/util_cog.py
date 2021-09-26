@@ -117,6 +117,18 @@ class UtilCog(BaseCog):
 
         await ctx.send(reply)
 
+    ### Reload Command ###
+    @commands.command(
+        brief="Reload commands (me only)", 
+        description="Reload all commands, useful for quick updates"
+    )
+    @commands.is_owner()
+    async def reload(self, ctx):
+        from bot import COGS
+        for cog in COGS:
+            self.bot.reload_extension(cog)
+        await ctx.send("All commands successfully reloaded!")
+
 
 
     ### Private methods ###
