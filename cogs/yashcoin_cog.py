@@ -28,8 +28,8 @@ class YashCoinCog(BaseCog):
 
         # Retrieve json contents
         json_data = await get_json_data(JSON_DATA_PATH)
-        guild_data = json_data.get(guild_id, { "yc_members" : {} })
-        yc_members_data = guild_data.get("yc_members")
+        guild_data = json_data.get(guild_id, {})
+        yc_members_data = guild_data.get("yc_members", {})
 
         # Update contents of json file if author id does not yet exist
         if author_id not in yc_members_data:
