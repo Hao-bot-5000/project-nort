@@ -4,9 +4,9 @@ from os         import remove
 import json
 import math
 
-from discord    import HTTPException
 from emoji      import emojize
 
+import discord
 import settings
 
 # Returns a path relative to the bot directory
@@ -60,7 +60,7 @@ async def try_upload_file(bot, channel, file_path, content=None,
         try:
             sent_msg = await bot.send_file(channel, file_path,
                                               content=content)
-        except HTTPException:
+        except discord.HTTPException:
             used_retries += 1
 
     if delete_after_send:
@@ -120,16 +120,17 @@ async def get_mentioned_member(message, backup):
 ### ETC ###
 NUM_BARS = 25
 
+# Returns a 2-tuple containing the percentage number and the progress bar
+# If the input is not a number, raise an error
 def create_progress_bar(percentage):
     if not isinstance(percentage, (int, float)):
         raise TypeError("input must be a number")
 
     percentage = min(1, max(0, percentage))
-    percent_display = int(percentage * 100)
-    # Added safety check for when percent_display=0, since logN(0) is undefined
-    percent_display_len = int(math.log10(max(1, percent_display))) + 1
-    print(percent_display_len)
-    padding = " " * (3 - percent_display_len)
 
     bars = "\u25a0" * math.floor(percentage * NUM_BARS) + " " * math.ceil((1 - percentage) * NUM_BARS)
-    return f"`{percent_display}% {padding}[{bars}]`"
+    return (int(percentage * 100), f"[{bars}]")
+
+# Returns an Embed object with a black bar
+def create_black_embed():
+    return discord.Embed(color=discord.Color.from_rgb(0, 0, 0))
