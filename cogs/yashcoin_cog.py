@@ -7,6 +7,7 @@ from utils              import (JSON_DATA_PATH, get_json_data, set_json_data,
                                 get_emoji, get_mentioned_member, create_progress_bar, 
                                 create_black_embed)
 
+
 class YashCoinCog(BaseCog):
     def __init__(self, bot):
         super().__init__(bot, category="YashCoin")
@@ -36,7 +37,9 @@ class YashCoinCog(BaseCog):
             yc_members_data[author_id] = {
                 "nort_coins" : 0,
                 "yash_coins" : 0,
-                "cringe_meter" : 0
+                "cringe_meter" : 0,
+                "prev_daily" : '-1',
+                "on_expedition": 0
             }
             guild_data.update({ "yc_members" : yc_members_data })
             json_data.update({ guild_id : guild_data })
@@ -113,8 +116,6 @@ class YashCoinCog(BaseCog):
         )
 
         await ctx.send(embed=embed_reply)
-
-
 
     ### Private methods ###
     # Returns None if member cannot be found in the guild

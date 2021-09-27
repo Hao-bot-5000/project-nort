@@ -4,7 +4,23 @@
             "149394827962744832": {
                 "nort_coins": 0,
                 "yash_coins": 0,
-                "cringe_meter": 0
+                "cringe_meter": 0,
+                "prev_daily": "-1",
+                "on_expedition": 0
+            },
+            "466898187001528321": {
+                "nort_coins": 400,
+                "yash_coins": 0,
+                "cringe_meter": 0,
+                "prev_daily": "2021-09-27",
+                "on_expedition": 1
+            },
+            "244353173601517568": {
+                "nort_coins": 400,
+                "yash_coins": 0,
+                "cringe_meter": 0,
+                "prev_daily": "2021-09-27",
+                "on_expedition": 0
             }
         }
     }
