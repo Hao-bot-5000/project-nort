@@ -36,21 +36,12 @@ class ExpeditionCog(BaseCog):
         if author_data["on_expedition"] == 0:
             author_data["on_expedition"] = 1
             await ctx.send("Expedition started!")
-            asyncio.create_task(self.inner(ctx))
+            asyncio.create_task(self.inner(ctx, author_data, json_data))
             await set_json_data(JSON_DATA_PATH, json_data)
         else:
             await ctx.send("Currently on expedition!")
 
-    async def inner(self, ctx):
-        author_id = str(ctx.author.id)
-        guild_id = str(ctx.guild.id)
-
-        # Retrieve json contents
-        json_data = await get_json_data(JSON_DATA_PATH)
-        guild_data = json_data.get(guild_id, {})
-        yc_members_data = guild_data.get("yc_members", {})
-
-        author_data = yc_members_data.get(author_id, {})
+    async def inner(self, ctx, author_data, json_data):
 
         await asyncio.sleep(10)
         await ctx.send("Expedition completed!")
