@@ -133,4 +133,4 @@ def create_progress_bar(percentage):
 
 # Returns an Embed object with a black bar
 def create_black_embed():
-    return discord.Embed(color=discord.Color.from_rgb(0, 0, 0))
+    return discord.Embed(color=0x010101)
