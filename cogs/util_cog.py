@@ -164,7 +164,7 @@ class UtilCog(BaseCog):
             emojis = self.__POLL_EMOJIS[:num_options]
 
         embed.add_field(
-            name=" " + message, 
+            name=f"**{message}**", 
             value='\n'.join(f"{e} `{o}`" for e, o in zip(emojis, options)), 
         )
 
