@@ -26,14 +26,15 @@ class ExpeditionCog(BaseCog):
     async def expedition(self, ctx, *args):
         author_id = str(ctx.author.id)
         guild_id = str(ctx.guild.id)
+        time = ''
 
         # Retrieve json contents
         json_data = await get_json_data(JSON_DATA_PATH)
         guild_data = json_data.get(guild_id, {})
         yc_members_data = guild_data.get("yc_members", {})
-
         author_data = yc_members_data.get(author_id, {})
-        time = ''
+
+        # Checking for arguements
         if len(args) > 1:
             await ctx.send("Too many arguments. Please enter: 3h, 6h, 12h or leave blank for 1h")
             return
@@ -43,9 +44,8 @@ class ExpeditionCog(BaseCog):
 
         if author_data["on_expedition"] == 0:
             author_data["on_expedition"] = 1
-            if len(args) == 0:
-                time = '1h'
-            time = str(args[0])
+            if len(args) == 1:
+                time = str(args)
             asyncio.create_task(self.inner(ctx, author_data, json_data, time))
             await ctx.send("Expedition started!")
             await set_json_data(JSON_DATA_PATH, json_data)
@@ -53,18 +53,18 @@ class ExpeditionCog(BaseCog):
             await ctx.send("Currently on expedition!")
 
     async def inner(self, ctx, author_data, json_data, time):
-        if str(time) == '3h':
-            await asyncio.sleep(5)
-            author_data["nort_coins"] += 3
-        elif str(time) == '6h':
-            await asyncio.sleep(10)
-            author_data["nort_coins"] += 5
-        elif str(time) == '12h':
-            await asyncio.sleep(15)
-            author_data["nort_coins"] += 100
+        if time == '3h':
+            await asyncio.sleep(10800)
+            author_data["nort_coins"] += 250
+        elif time == '6h':
+            await asyncio.sleep(21600)
+            author_data["nort_coins"] += 450
+        elif time == '12h':
+            await asyncio.sleep(43200)
+            author_data["nort_coins"] += 750
         else:
-            await asyncio.sleep(2)
-            author_data["nort_coins"] += 1000
+            await asyncio.sleep(3600)
+            author_data["nort_coins"] += 100
         await ctx.send("Expedition completed!")
         author_data["on_expedition"] = 0
         await set_json_data(JSON_DATA_PATH, json_data)
