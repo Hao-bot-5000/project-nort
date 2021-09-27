@@ -61,7 +61,7 @@ class ExpeditionCog(BaseCog):
             author_data["nort_coins"] += 450
         elif time == '12h':
             await asyncio.sleep(43200)
-            author_data["nort_coins"] += 750
+            author_data["nort_coins"] += 850
         else:
             await asyncio.sleep(3600)
             author_data["nort_coins"] += 100
@@ -71,8 +71,8 @@ class ExpeditionCog(BaseCog):
 
     ### Daily Claim Command ###
     @commands.command(
-        brief="Claim daily NortCoins",
-        description="Claim daily NortCoins"
+        brief="Claim 600 daily NortCoins",
+        description="Claim 600 daily NortCoins"
     )
     @commands.guild_only()
     async def daily(self, ctx, *args):
@@ -87,7 +87,7 @@ class ExpeditionCog(BaseCog):
         author_data = yc_members_data.get(author_id, {})
         if author_data.get('prev_daily', '-1') != str(date.today()):
             nort_coins = author_data.get("nort_coins", 0)
-            author_data["yash_coins"] += 100
+            author_data["yash_coins"] += 600
             author_data["prev_daily"] = str(date.today())
             await ctx.send("Daily YashCoins claimed!")
         else:
