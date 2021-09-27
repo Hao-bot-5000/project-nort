@@ -72,15 +72,13 @@ class YashCoinCog(BaseCog):
             icon_url=member.get("icon", None)
         )
         embed_reply.add_field(
-            name="\u200b", 
-            value=(f"{get_emoji(':moneybag:')} **YashCoins**\n" + 
-                   f"{get_emoji(':coin:')} **NortCoins**"), 
+            name=f"**YashCoins** {get_emoji(':moneybag:')}", 
+            value=f"`{yashcoins}`", 
             inline=True
         )
         embed_reply.add_field(
-            name="\u200b", 
-            value=(f"`{yashcoins}`\n" + 
-                   f"`{nortcoins}`"), 
+            name=f"**NortCoins** {get_emoji(':coin:')}", 
+            value=f"`{nortcoins}`", 
             inline=True
         )
 
@@ -109,17 +107,9 @@ class YashCoinCog(BaseCog):
             name=f"{member.get('display_name', 'Member')}'s Cringe Meter:", 
             icon_url=member.get("icon", None)
         )
-        embed_reply.add_field(
-            name="\u200b", 
-            value=("**Status**\n" + 
-                   f"**{cringe_meter_bar[0]}%**"), 
-            inline=True
-        )
-        embed_reply.add_field(
-            name="\u200b", 
-            value=(f"`{cringe_meter_status}`\n" + 
-                   f"`{cringe_meter_bar[1]}`"), 
-            inline=True
+        embed_reply.description = (
+            f"**Status** `{cringe_meter_status}`\n" + 
+            f"**{cringe_meter_bar[0]}%** `{cringe_meter_bar[1]}`"
         )
 
         await ctx.send(embed=embed_reply)
