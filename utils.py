@@ -77,23 +77,24 @@ async def try_upload_file(bot, channel, file_path, content=None,
 JSON_DATA_PATH = "./assets/json/data.json"
 
 # Retrieve json contents based on path URL
-# If file cannot be opened or file is not a valid JSON document, 
-# return an empty dictionary
+# If file is not a valid JSON document, return an empty dictionary
+# If file cannot be opened, throws an error
 async def get_json_data(path):
     try:
         json_file = open(path, "r")
-        return json.load(json_file)
-    except (FileNotFoundError, json.JSONDecodeError):
-        return {}
+        json_data = json.load(json_file)
+    except json.JSONDecodeError:
+        json_data = {}
+    
+    json_file.close()
+    return json_data
 
 # Modify json contents stored at path URL
-# If file cannot be opened, prints error into console and continues
+# If file cannot be opened, throws an error
 async def set_json_data(path, json_data):
-    try:
-        json_file = open(path, "w")
-        json.dump(json_data, json_file, indent=4)
-    except FileNotFoundError as e:
-        print(e)
+    json_file = open(path, "w")
+    json.dump(json_data, json_file, indent=4)
+    json_file.close()
 
 
 
