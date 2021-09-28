@@ -6,7 +6,7 @@ from cogs.base_cog      import BaseCog
 from utils              import (JSON_DATA_PATH, get_json_data, set_json_data, 
                                 get_emoji, get_mentioned_member, create_progress_bar, 
                                 create_black_embed)
-
+from custom_errors import TooManyArgumentsError
 
 class YashCoinCog(BaseCog):
     def __init__(self, bot):
@@ -21,8 +21,7 @@ class YashCoinCog(BaseCog):
     @commands.guild_only()
     async def initiate(self, ctx, *args):
         if len(args) > 0:
-            await ctx.send("Too many arguments")
-            return
+            raise TooManyArgumentsError("initiate")
 
         guild_id = str(ctx.guild.id)
         author_id = str(ctx.author.id)
@@ -57,6 +56,9 @@ class YashCoinCog(BaseCog):
     )
     @commands.guild_only()
     async def balance(self, ctx, member=None, *args):
+        if len(args) > 0:
+            raise TooManyArgumentsError("balance")
+
         member = await self.__get_yc_member(ctx, member if member else ctx.author, args)
 
         if member is None:
@@ -92,6 +94,9 @@ class YashCoinCog(BaseCog):
     )
     @commands.guild_only()
     async def cringemeter(self, ctx, member=None, *args):
+        if len(args) > 0:
+            raise TooManyArgumentsError("cringemeter")
+
         member = await self.__get_yc_member(ctx, member if member else ctx.author, args)
 
         if member is None:
@@ -119,10 +124,6 @@ class YashCoinCog(BaseCog):
     # Returns None if member is found in the guild, but not in the JSON file
     # Returns a dict containing the member's data and display name if member is found
     async def __get_yc_member(self, ctx, member, args):
-        if len(args) > 0:
-            await ctx.send("Too many arguments")
-            return None
-
         guild_id = str(ctx.guild.id)
 
         # Retrieve json contents

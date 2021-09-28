@@ -10,7 +10,9 @@ from discord.ext                    import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from multiprocessing                import Process
 
-from utils                          import JSON_DATA_PATH, get_json_data, set_json_data
+from utils                          import (JSON_DATA_PATH, get_json_data, set_json_data, 
+                                            get_emoji)
+import custom_errors
 
 # Set to remember if the bot is already running, since on_ready may be called
 # more than once on reconnects
@@ -69,10 +71,22 @@ def main():
                 f"That command does not exist. For more information, please run " +
                 f"`{bot.command_prefix}help`"
             )
+        elif isinstance(error, custom_errors.TooManyArgumentsError):
+            await ctx.send(
+                "You have entered too many arguments. Please run " + 
+                f"`{bot.command_prefix}help {error.command}` for more information " + 
+                "on this command"
+            )
+        elif isinstance(error, custom_errors.MemberNotFoundError):
+            await ctx.send(
+                f"You are not a member of YashCoin{get_emoji(':tm:')} Incorporated"
+            )
+        elif isinstance(error, custom_errors.CustomCommandError):
+            await ctx.send(error.message)
         elif isinstance(error, ArgumentParsingError):
             await ctx.send(
-                f"You have entered an invalid argument. Please make sure that " + 
-                "your arguments are properly formatted for this command"
+                f"You have entered an improper argument. Please make sure that " + 
+                "your arguments are properly formatted"
             )
             print(error) # in case it isn't just an issue with improper quotation marks
         else:

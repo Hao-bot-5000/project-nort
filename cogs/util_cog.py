@@ -5,6 +5,7 @@ from cogs.base_cog      import BaseCog
 
 from random             import randint
 from utils              import get_emoji, create_black_embed
+from custom_errors      import CustomCommandError, TooManyArgumentsError
 
 class UtilCog(BaseCog):
     def __init__(self, bot):
@@ -18,8 +19,7 @@ class UtilCog(BaseCog):
     @commands.guild_only()
     async def help(self, ctx, command=None, *args):
         if len(args) > 0:
-            await ctx.send("Too many arguments")
-            return
+            raise TooManyArgumentsError("help")
 
         if command is None:
             reply = f"{ctx.author.mention}\n"
@@ -37,9 +37,6 @@ class UtilCog(BaseCog):
             )
         else:
             res = await self.__get_command_or_cog(ctx, command)
-
-            if res is None:
-                return
 
             if isinstance(res, commands.Command):
                 reply = f"{ctx.author.mention}\n\n`{self.bot.command_prefix}{res.name}"
@@ -67,17 +64,15 @@ class UtilCog(BaseCog):
         num_options = len(options)
 
         if num_options > 10:
-            await ctx.send("Too many arguments")
-            return
+            raise TooManyArgumentsError("poll")
 
         if message is None:
             sample_member = ctx.guild.owner.display_name
-            await ctx.send(
+            raise CustomCommandError(
                 f"Please input a message to vote on — for example: " + 
                 f"`{self.bot.command_prefix}poll \"Is {sample_member} a real one?\" " + 
                 "yes no`"
             )
-            return
         
         embed_reply = create_black_embed()
 
@@ -97,20 +92,16 @@ class UtilCog(BaseCog):
     @commands.guild_only()
     async def roll(self, ctx, value=None, *args):
         if len(args) > 0:
-            await ctx.send("Too many arguments")
-            return
+            raise TooManyArgumentsError("roll")
 
         if value is None:
             value = 100
         else:
             try:
                 value = int(value)
-                if value < 1:
-                    await ctx.send("The value must be greater than 0")
-                    return
+                if value < 1: raise ValueError()
             except ValueError:
-                await ctx.send("Please provide a valid number")
-                return
+                raise CustomCommandError("Please provide a valid positive number")
 
         roll = randint(1, value)
         reply = f"{get_emoji(':game_die:')} You rolled **{roll}** out of **{value}**!"

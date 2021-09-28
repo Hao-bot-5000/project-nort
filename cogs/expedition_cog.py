@@ -6,6 +6,7 @@ from cogs.base_cog import BaseCog
 from utils import (JSON_DATA_PATH, get_json_data, set_json_data,
                    get_emoji, get_mentioned_member, create_progress_bar,
                    create_black_embed)
+from custom_errors import MemberNotFoundError, TooManyArgumentsError, CustomCommandError
 
 import asyncio
 
@@ -24,8 +25,7 @@ class ExpeditionCog(BaseCog):
     @commands.guild_only()
     async def daily(self, ctx, *args):
         if len(args) > 0:
-            await ctx.send("Too many arguments")
-            return
+            raise TooManyArgumentsError("daily")
 
         author_id = str(ctx.author.id)
         guild_id = str(ctx.guild.id)
@@ -35,7 +35,10 @@ class ExpeditionCog(BaseCog):
         guild_data = json_data.get(guild_id, {})
         yc_members_data = guild_data.get("yc_members", {})
 
-        author_data = yc_members_data.get(author_id, {})
+        author_data = yc_members_data.get(author_id, None)
+
+        if author_data is None:
+            raise MemberNotFoundError()
 
         today = str(date.today())
         if author_data.get("prev_daily", None) != today:
@@ -64,8 +67,7 @@ class ExpeditionCog(BaseCog):
     async def expedition(self, ctx, timescale=None, *args):
         # Checking for arguements
         if len(args) > 0:
-            await ctx.send("Too many arguments")
-            return
+            raise TooManyArgumentsError("expedition")
 
         author_id = str(ctx.author.id)
         guild_id = str(ctx.guild.id)
@@ -74,7 +76,11 @@ class ExpeditionCog(BaseCog):
         json_data = await get_json_data(JSON_DATA_PATH)
         guild_data = json_data.get(guild_id, {})
         yc_members_data = guild_data.get("yc_members", {})
-        author_data = yc_members_data.get(author_id, {})
+
+        author_data = yc_members_data.get(author_id, None)
+
+        if author_data is None:
+            raise MemberNotFoundError()
         
         if timescale is None: timescale = "short"
 
@@ -91,8 +97,9 @@ class ExpeditionCog(BaseCog):
     __DURATIONS = (10, 20, 40)
     async def __start_expedition(self, ctx, author_data, json_data, timescale):
         if timescale not in self.__TIMES:
-            await ctx.send(f"Please input a valid timescale ({', '.join(self.__TIMES)})")
-            return
+            raise CustomCommandError(
+                f"Please input a valid timescale ({', '.join(self.__TIMES)})"
+            )
 
         author_data["on_expedition"] = 1
         await set_json_data(JSON_DATA_PATH, json_data)
