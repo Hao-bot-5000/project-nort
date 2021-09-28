@@ -38,7 +38,7 @@ class YashCoinCog(BaseCog):
                 "nort_coins" : 0,
                 "yash_coins" : 0,
                 "cringe_meter" : 0,
-                "prev_daily" : '-1',
+                "prev_daily" : None,
                 "on_expedition": 0
             }
             guild_data.update({ "yc_members" : yc_members_data })

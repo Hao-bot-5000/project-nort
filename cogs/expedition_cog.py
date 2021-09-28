@@ -82,7 +82,7 @@ class ExpeditionCog(BaseCog):
         yc_members_data = guild_data.get("yc_members", {})
 
         author_data = yc_members_data.get(author_id, {})
-        if author_data.get('prev_daily', '-1') != str(date.today()):
+        if author_data.get('prev_daily', None) != str(date.today()):
             author_data["nort_coins"] += 600
             author_data["prev_daily"] = str(date.today())
             await ctx.send("Daily NortCoins claimed!")
