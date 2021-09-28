@@ -80,9 +80,7 @@ class ExpeditionCog(BaseCog):
         if timescale is None: timescale = "short"
 
         if author_data.get("on_expedition", 0) == 0:
-            asyncio.create_task(
-                self.__start_expedition(ctx, author_data, json_data, timescale)
-            )
+            await self.__start_expedition(ctx, author_data, json_data, timescale)
         else:
             await ctx.send("Currently on expedition!")
     
@@ -90,8 +88,8 @@ class ExpeditionCog(BaseCog):
 
     ### Private Methods ###
     __TIMES = ("short", "normal", "long")
-    __REWARDS = (100, 250, 625)
-    __DURATIONS = (10, 20, 40)
+    __REWARDS = (100, 250, 700)
+    __DURATIONS = (10, 30, 90)
     async def __start_expedition(self, ctx, author_data, json_data, timescale):
         if timescale not in self.__TIMES:
             raise CustomCommandError(
