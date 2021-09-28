@@ -42,14 +42,8 @@ class ExpeditionCog(BaseCog):
 
         today = str(date.today())
         if author_data.get("prev_daily", None) != today:
-            # When modifying existing data based on its previous value, 
-            # check that the value's data type is valid
-            try:
-                current_nortcoins = int(author_data.get("nort_coins", 0))
-            except TypeError:
-                current_nortcoins = 0
 
-            author_data["nort_coins"] = current_nortcoins + 600
+            author_data["nort_coins"] = self.__add_coins(author_data, "nort_coins", 600)
             author_data["prev_daily"] = today
             await ctx.send("Daily NortCoins successfully claimed!")
         else:
@@ -61,7 +55,8 @@ class ExpeditionCog(BaseCog):
     @commands.command(
         aliases=["exp", "quest"],
         brief="Go on expedition to find NortCoins",
-        description="Start an expedition based on the given timescale (short, normal, long)"
+        description="Start an expedition based on the given timescale " 
+                    "(short, normal, long)"
     )
     @commands.guild_only()
     async def expedition(self, ctx, timescale=None, *args):
@@ -85,7 +80,9 @@ class ExpeditionCog(BaseCog):
         if timescale is None: timescale = "short"
 
         if author_data.get("on_expedition", 0) == 0:
-            asyncio.create_task(self.__start_expedition(ctx, author_data, json_data, timescale))
+            asyncio.create_task(
+                self.__start_expedition(ctx, author_data, json_data, timescale)
+            )
         else:
             await ctx.send("Currently on expedition!")
     
@@ -105,22 +102,25 @@ class ExpeditionCog(BaseCog):
         await set_json_data(JSON_DATA_PATH, json_data)
         await ctx.send("Expedition started!")
 
-        time_idx = self.__TIMES.index(timescale)
+        idx = self.__TIMES.index(timescale)
 
-        await asyncio.sleep(self.__DURATIONS[time_idx])
+        await asyncio.sleep(self.__DURATIONS[idx])
 
-        # When modifying existing data based on its previous value, 
-        # check that the value's data type is valid
-        try:
-            current_nortcoins = int(author_data.get("nort_coins", 0))
-        except TypeError:
-            current_nortcoins = 0
-
-        author_data["nort_coins"] = current_nortcoins + self.__REWARDS[time_idx]
+        author_data["nort_coins"] = self.__add_coins(
+            author_data, "nort_coins", self.__REWARDS[idx]
+        )
         
         author_data["on_expedition"] = 0
         await set_json_data(JSON_DATA_PATH, json_data)
         await ctx.send(f"{ctx.author.mention}\nYour expedition has completed!")
+
+    def __add_coins(self, member_data, coin_type, amount):
+        # When modifying existing data based on its previous value, 
+        # check that the value's data type is valid (assume 0 if invalid)
+        try:
+            return int(member_data.get(coin_type, 0)) + amount
+        except TypeError:
+            return amount
 
 
 def setup(bot):
