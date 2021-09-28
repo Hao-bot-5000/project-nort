@@ -29,8 +29,8 @@ class YashCoinCog(BaseCog):
 
         # Retrieve json contents
         json_data = await get_json_data(JSON_DATA_PATH)
-        guild_data = json_data.get(guild_id, {})
-        yc_members_data = guild_data.get("yc_members", {})
+        guild_data = json_data.setdefault(guild_id, {})
+        yc_members_data = guild_data.setdefault("yc_members", {})
 
         # Update contents of json file if author id does not yet exist
         if author_id not in yc_members_data:
@@ -41,9 +41,6 @@ class YashCoinCog(BaseCog):
                 "prev_daily" : None,
                 "on_expedition": 0
             }
-            guild_data.update({ "yc_members" : yc_members_data })
-            json_data.update({ guild_id : guild_data })
-
             await set_json_data(JSON_DATA_PATH, json_data)
 
             reply = f"Thank you for joining YashCoin {get_emoji(':tm:')} Incorporated!"
