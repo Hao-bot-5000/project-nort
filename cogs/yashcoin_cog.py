@@ -8,6 +8,9 @@ from utils              import (JSON_DATA_PATH, get_json_data, set_json_data,
                                 create_black_embed)
 from custom_errors import TooManyArgumentsError
 
+from math import sin
+import time
+
 class YashCoinCog(BaseCog):
     def __init__(self, bot):
         super().__init__(bot, category="YashCoin")
@@ -118,6 +121,31 @@ class YashCoinCog(BaseCog):
         )
 
         await ctx.send(embed=embed_reply)
+
+    ### Stocks Command ###
+    __BASE_RATE = 1000
+    __FLUCTUATION = 100
+    __TIMESCALE = 3600
+    __SAMPLE = 60
+    @commands.command(
+        brief="Displays YashCoin values", 
+        description="Displays the current YashCoin conversion rate"
+    )
+    @commands.guild_only()
+    async def stocks(self, ctx, *args):
+        if len(args) > 0:
+            raise TooManyArgumentsError("stocks")
+        
+        current_time = time.time()
+        previous_rate = int(self.__BASE_RATE + self.__FLUCTUATION * sin((current_time - self.__SAMPLE) / self.__TIMESCALE))
+        current_rate = int(self.__BASE_RATE + self.__FLUCTUATION * sin(current_time / self.__TIMESCALE))
+        status = get_emoji(":arrow_up:"    if previous_rate < current_rate else 
+                           ":arrow_down:"  if previous_rate > current_rate else 
+                           ":stop_button:")
+
+        await ctx.send(f"Value: {current_rate} {status}")
+
+
 
     ### Private methods ###
     # Returns None if member cannot be found in the guild
