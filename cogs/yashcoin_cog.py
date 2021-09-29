@@ -139,8 +139,9 @@ class YashCoinCog(BaseCog):
         current_time = time.time()
         previous_rate = int(self.__BASE_RATE + self.__FLUCTUATION * sin((current_time - self.__SAMPLE) / self.__TIMESCALE))
         current_rate = int(self.__BASE_RATE + self.__FLUCTUATION * sin(current_time / self.__TIMESCALE))
-        status = get_emoji(":arrow_up:"    if previous_rate < current_rate else 
-                           ":arrow_down:"  if previous_rate > current_rate else 
+        
+        status = get_emoji(":arrow_up:"    if previous_rate < current_rate else
+                           ":arrow_down:"  if previous_rate > current_rate else #NOSONAR -- Ignoring nested ternary warning
                            ":stop_button:")
 
         await ctx.send(f"Value: {current_rate} {status}")
