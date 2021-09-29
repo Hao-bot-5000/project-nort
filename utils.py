@@ -33,7 +33,7 @@ def get_emoji(emoji_name, fail_silently=False):
 # Uses the channel name by default
 # If many matching channels are found, returns the first one
 def get_channel(bot, value, attribute="name"):
-    channel = next((c for c in bot.get_all_channels() 
+    channel = next((c for c in bot.get_all_channels()
                     if getattr(c, attribute).lower() == value.lower()), None)
     if not channel:
         raise ValueError("No such channel")
@@ -51,7 +51,7 @@ async def send_in_channel(bot, channel_name, *args):
 # Attempts to upload a file in a certain channel
 # content refers to the additional text that can be sent alongside the file
 # delete_after_send can be set to True to delete the file afterwards
-async def try_upload_file(bot, channel, file_path, content=None, 
+async def try_upload_file(bot, channel, file_path, content=None,
                           delete_after_send=False, retries=3):
     used_retries = 0
     sent_msg = None
@@ -85,7 +85,7 @@ async def get_json_data(path):
         json_data = json.load(json_file)
     except json.JSONDecodeError:
         json_data = {}
-    
+
     json_file.close()
     return json_data
 
@@ -100,7 +100,7 @@ async def set_json_data(path, json_data):
 
 ### Member Searching Helpers ###
 # Attempts to retrieve a member based on the message's mention
-# If no member is mentioned in the message, run a name-based and 
+# If no member is mentioned in the message, run a name-based and
 # id-based search to retrieve the member
 # If the member cannot be found, returns None
 async def get_mentioned_member(message, backup):
@@ -113,7 +113,7 @@ async def get_mentioned_member(message, backup):
             member = await guild.get_member(int(backup))
         except Exception:
             pass
-    
+
     return member
 
 

@@ -3,8 +3,8 @@ from discord.ext        import commands
 
 from cogs.base_cog      import BaseCog
 
-from utils              import (JSON_DATA_PATH, get_json_data, set_json_data, 
-                                get_emoji, get_mentioned_member, create_progress_bar, 
+from utils              import (JSON_DATA_PATH, get_json_data, set_json_data,
+                                get_emoji, get_mentioned_member, create_progress_bar,
                                 create_black_embed)
 from custom_errors import TooManyArgumentsError
 
@@ -14,11 +14,11 @@ import time
 class YashCoinCog(BaseCog):
     def __init__(self, bot):
         super().__init__(bot, category="YashCoin")
-    
+
     ### Initiate command ###
     @commands.command(
-        aliases=["init", "join"], 
-        brief="Enters YashCoin event", 
+        aliases=["init", "join"],
+        brief="Enters YashCoin event",
         description="Adds yourself to the YashCoin event"
     )
     @commands.guild_only()
@@ -53,8 +53,8 @@ class YashCoinCog(BaseCog):
 
     ### Balance command ###
     @commands.command(
-        aliases=["bal"], 
-        brief="Displays balance", 
+        aliases=["bal"],
+        brief="Displays balance",
         description="Displays the member's current balance"
     )
     @commands.guild_only()
@@ -73,17 +73,17 @@ class YashCoinCog(BaseCog):
         embed_reply = create_black_embed()
 
         embed_reply.set_author(
-            name=f"{member.get('display_name', 'Member')}'s Balance:", 
+            name=f"{member.get('display_name', 'Member')}'s Balance:",
             icon_url=member.get("icon", None)
         )
         embed_reply.add_field(
-            name=f"**YashCoins** {get_emoji(':moneybag:')}", 
-            value=f"`{yashcoins}`", 
+            name=f"**YashCoins** {get_emoji(':moneybag:')}",
+            value=f"`{yashcoins}`",
             inline=True
         )
         embed_reply.add_field(
-            name=f"**NortCoins** {get_emoji(':coin:')}", 
-            value=f"`{nortcoins}`", 
+            name=f"**NortCoins** {get_emoji(':coin:')}",
+            value=f"`{nortcoins}`",
             inline=True
         )
 
@@ -91,8 +91,8 @@ class YashCoinCog(BaseCog):
 
     ### CM Command ###
     @commands.command(
-        aliases=["cm"], 
-        brief="Displays cringe meter", 
+        aliases=["cm"],
+        brief="Displays cringe meter",
         description="Displays the member's cringe meter"
     )
     @commands.guild_only()
@@ -112,11 +112,11 @@ class YashCoinCog(BaseCog):
         embed_reply = create_black_embed()
 
         embed_reply.set_author(
-            name=f"{member.get('display_name', 'Member')}'s Cringe Meter:", 
+            name=f"{member.get('display_name', 'Member')}'s Cringe Meter:",
             icon_url=member.get("icon", None)
         )
         embed_reply.description = (
-            f"**Status** `{cringe_meter_status}`\n" + 
+            f"**Status** `{cringe_meter_status}`\n" +
             f"**{cringe_meter_bar[0]}%** `{cringe_meter_bar[1]}`"
         )
 
@@ -128,18 +128,18 @@ class YashCoinCog(BaseCog):
     __TIMESCALE = 3600
     __SAMPLE = 60
     @commands.command(
-        brief="Displays YashCoin values", 
+        brief="Displays YashCoin values",
         description="Displays the current YashCoin conversion rate"
     )
     @commands.guild_only()
     async def stocks(self, ctx, *args):
         if len(args) > 0:
             raise TooManyArgumentsError("stocks")
-        
+
         current_time = time.time()
         previous_rate = int(self.__BASE_RATE + self.__FLUCTUATION * sin((current_time - self.__SAMPLE) / self.__TIMESCALE))
         current_rate = int(self.__BASE_RATE + self.__FLUCTUATION * sin(current_time / self.__TIMESCALE))
-        
+
         status = get_emoji(":arrow_up:"    if previous_rate < current_rate else
                            ":arrow_down:"  if previous_rate > current_rate else #NOSONAR -- Ignoring nested ternary warning
                            ":stop_button:")
@@ -173,17 +173,17 @@ class YashCoinCog(BaseCog):
 
         if member_data is None:
             await ctx.send(
-                (f"{member.display_name} is " if member != ctx.author else "You are ") + 
+                (f"{member.display_name} is " if member != ctx.author else "You are ") +
                 f"not a member of YashCoin{get_emoji(':tm:')} Incorporated"
             )
             return None
-        
+
         return {
-            "data" : member_data, 
-            "display_name" : member.display_name, 
-            "icon" : member.avatar_url 
+            "data" : member_data,
+            "display_name" : member.display_name,
+            "icon" : member.avatar_url
         }
-    
+
     __CRINGE_STATUSES = ("Not Cringe", "Kinda Cringe", "Cringe", "Ultra Cringe", "YASH")
     def __get_cringe_status(self, percent):
         if percent == 0.69: return "Nice"
@@ -191,4 +191,4 @@ class YashCoinCog(BaseCog):
 
 
 def setup(bot):
-    bot.add_cog(YashCoinCog(bot)) 
+    bot.add_cog(YashCoinCog(bot))

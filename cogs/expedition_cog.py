@@ -16,7 +16,7 @@ from datetime import date
 class ExpeditionCog(BaseCog):
     def __init__(self, bot):
         super().__init__(bot, category="Expedition")
-    
+
     ### Daily Claim Command ###
     @commands.command(
         brief="Claim 600 daily NortCoins",
@@ -55,7 +55,7 @@ class ExpeditionCog(BaseCog):
     @commands.command(
         aliases=["exp", "quest"],
         brief="Go on expedition to find NortCoins",
-        description="Start an expedition based on the given timescale " 
+        description="Start an expedition based on the given timescale "
                     "(short, normal, long)"
     )
     @commands.guild_only()
@@ -76,14 +76,14 @@ class ExpeditionCog(BaseCog):
 
         if author_data is None:
             raise MemberNotFoundError()
-        
+
         if timescale is None: timescale = "short"
 
         if author_data.get("on_expedition", 0) == 0:
             await self.__start_expedition(ctx, author_data, json_data, timescale)
         else:
             await ctx.send("Currently on expedition!")
-    
+
 
 
     ### Private Methods ###
@@ -107,13 +107,13 @@ class ExpeditionCog(BaseCog):
         author_data["nort_coins"] = self.__add_coins(
             author_data, "nort_coins", self.__REWARDS[idx]
         )
-        
+
         author_data["on_expedition"] = 0
         await set_json_data(JSON_DATA_PATH, json_data)
         await ctx.send(f"{ctx.author.mention}\nYour expedition has completed!")
 
     def __add_coins(self, member_data, coin_type, amount):
-        # When modifying existing data based on its previous value, 
+        # When modifying existing data based on its previous value,
         # check that the value's data type is valid (assume 0 if invalid)
         try:
             return int(member_data.get(coin_type, 0)) + amount

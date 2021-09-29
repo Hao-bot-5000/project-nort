@@ -10,7 +10,7 @@ from custom_errors      import CustomCommandError, TooManyArgumentsError
 class UtilCog(BaseCog):
     def __init__(self, bot):
         super().__init__(bot, category="Utility")
-    
+
     ### Help Command ###
     @commands.command(
         brief="Displays commands",
@@ -26,29 +26,29 @@ class UtilCog(BaseCog):
         if command is None:
             for cog in self.bot.cogs.values():
                 reply += (
-                    f"\n**{cog.category}**:" + 
+                    f"\n**{cog.category}**:" +
                     self.__command_list_to_string(cog.get_commands())
                 )
 
             reply += (
-                f"\n\nRun `{self.bot.command_prefix}help <command>` " + 
-                "for more information on a command" + 
+                f"\n\nRun `{self.bot.command_prefix}help <command>` " +
+                "for more information on a command" +
 
-                f"\nYou can also run `{self.bot.command_prefix}help <category>` " + 
-                "for more information on a category" 
+                f"\nYou can also run `{self.bot.command_prefix}help <category>` " +
+                "for more information on a category"
             )
         else:
             res = await self.__get_command_or_cog(ctx, command)
 
             if isinstance(res, commands.Command):
                 reply += (
-                    f"\n`{self.bot.command_prefix}{res.name}" + 
-                    "".join((f" <{p}>" for p in list(res.clean_params.keys())[:-1])) + 
+                    f"\n`{self.bot.command_prefix}{res.name}" +
+                    "".join((f" <{p}>" for p in list(res.clean_params.keys())[:-1])) +
                     f"`: {res.description}"
                 )
             else:
                 reply += (
-                    f"\n**{res.category}**:" + 
+                    f"\n**{res.category}**:" +
                     self.__command_list_to_string(res.get_commands())
                 )
 
@@ -56,12 +56,12 @@ class UtilCog(BaseCog):
 
     ### Poll Command ###
     @commands.command(
-        brief="Generates poll", 
+        brief="Generates poll",
         description="Generates a poll that members can participate in "
                     "by reacting to the given options (maximum of 10)"
     )
     @commands.guild_only()
-    # NOTE: unused 'args' variable acts as filler so that the 
+    # NOTE: unused 'args' variable acts as filler so that the
     #       'help' command does not cut off the 'message' variable
     async def poll(self, ctx, message=None, *options, args=None):
         num_options = len(options)
@@ -72,24 +72,24 @@ class UtilCog(BaseCog):
         if message is None:
             sample_member = ctx.guild.owner.display_name
             raise CustomCommandError(
-                f"Please input a message to vote on — for example: " + 
-                f"`{self.bot.command_prefix}poll \"Is {sample_member} a real one?\" " + 
+                f"Please input a message to vote on — for example: " +
+                f"`{self.bot.command_prefix}poll \"Is {sample_member} a real one?\" " +
                 "yes no`"
             )
-        
+
         embed_reply = create_black_embed()
 
         embed_reply.set_author(
-            name=f"Poll by {ctx.author.display_name}:", 
+            name=f"Poll by {ctx.author.display_name}:",
             icon_url=ctx.author.avatar_url
         )
-        
+
         self.__add_poll_options(message, embed_reply, options, num_options)
         await self.__add_poll_reactions(await ctx.send(embed=embed_reply), num_options)
 
     ### Random Number Generator Command ###
     @commands.command(
-        brief="Generates random number", 
+        brief="Generates random number",
         description="Generates a random number between 1 and the given number"
     )
     @commands.guild_only()
@@ -113,7 +113,7 @@ class UtilCog(BaseCog):
 
     ### Reload Command ###
     @commands.command(
-        brief="Reload commands (me only)", 
+        brief="Reload commands (me only)",
         description="Reload all commands, useful for quick updates"
     )
     @commands.is_owner()
@@ -132,23 +132,23 @@ class UtilCog(BaseCog):
             cog = next((c for c in self.bot.cogs.values() if c.category == name), None)
             if cog is None:
                 await ctx.send(
-                    f"No command or category called '{name}' found; run " + 
-                    f"`{self.bot.command_prefix}help` for the list of all " + 
+                    f"No command or category called '{name}' found; run " +
+                    f"`{self.bot.command_prefix}help` for the list of all " +
                     "available commands and categories"
                 )
                 return None
-            
+
             return cog
 
         return cmd
-    
+
     def __command_list_to_string(self, cmds):
-        return "".join((f"\n\t`{self.bot.command_prefix}{cmd.name}`: {cmd.brief}" 
+        return "".join((f"\n\t`{self.bot.command_prefix}{cmd.name}`: {cmd.brief}"
                         for cmd in cmds))
-    
-    __POLL_EMOJIS = (get_emoji(":one:"),   get_emoji(":two:"),   get_emoji(":three:"), 
-                     get_emoji(":four:"),  get_emoji(":five:"),  get_emoji(":six:"), 
-                     get_emoji(":seven:"), get_emoji(":eight:"), get_emoji(":nine:"), 
+
+    __POLL_EMOJIS = (get_emoji(":one:"),   get_emoji(":two:"),   get_emoji(":three:"),
+                     get_emoji(":four:"),  get_emoji(":five:"),  get_emoji(":six:"),
+                     get_emoji(":seven:"), get_emoji(":eight:"), get_emoji(":nine:"),
                      get_emoji(":ten:"))
     def __add_poll_options(self, message, embed, options, num_options):
         if num_options == 0:
@@ -158,8 +158,8 @@ class UtilCog(BaseCog):
             emojis = self.__POLL_EMOJIS[:num_options]
 
         embed.add_field(
-            name=f"**{message}**", 
-            value='\n'.join(f"{e} `{o}`" for e, o in zip(emojis, options)), 
+            name=f"**{message}**",
+            value='\n'.join(f"{e} `{o}`" for e, o in zip(emojis, options)),
         )
 
     async def __add_poll_reactions(self, message, num_options):
@@ -172,4 +172,4 @@ class UtilCog(BaseCog):
             await message.add_reaction(self.__POLL_EMOJIS[i])
 
 def setup(bot):
-    bot.add_cog(UtilCog(bot)) 
+    bot.add_cog(UtilCog(bot))
