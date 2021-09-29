@@ -21,12 +21,14 @@ class UtilCog(BaseCog):
         if len(args) > 0:
             raise TooManyArgumentsError("help")
 
-        if command is None:
-            reply = f"{ctx.author.mention}\n"
+        reply = f"{ctx.author.mention}\n"
 
+        if command is None:
             for cog in self.bot.cogs.values():
-                reply += f"\n**{cog.category}**:"
-                reply += self.__command_list_to_string(cog.get_commands())
+                reply += (
+                    f"\n**{cog.category}**:" + 
+                    self.__command_list_to_string(cog.get_commands())
+                )
 
             reply += (
                 f"\n\nRun `{self.bot.command_prefix}help <command>` " + 
@@ -39,15 +41,16 @@ class UtilCog(BaseCog):
             res = await self.__get_command_or_cog(ctx, command)
 
             if isinstance(res, commands.Command):
-                reply = f"{ctx.author.mention}\n\n`{self.bot.command_prefix}{res.name}"
-
-                for param in list(res.clean_params.keys())[:-1]:
-                    reply += f" <{param}>"
-
-                reply += f"`: {res.description}"
+                reply += (
+                    f"\n`{self.bot.command_prefix}{res.name}" + 
+                    "".join((f" <{p}>" for p in list(res.clean_params.keys())[:-1])) + 
+                    f"`: {res.description}"
+                )
             else:
-                reply = f"{ctx.author.mention}\n\n**{res.category}**:"
-                reply += self.__command_list_to_string(res.get_commands())
+                reply += (
+                    f"\n**{res.category}**:" + 
+                    self.__command_list_to_string(res.get_commands())
+                )
 
         await ctx.send(reply)
 
@@ -140,8 +143,8 @@ class UtilCog(BaseCog):
         return cmd
     
     def __command_list_to_string(self, cmds):
-        return "".join([f"\n\t`{self.bot.command_prefix}{cmd.name}`: {cmd.brief}" 
-                        for cmd in cmds])
+        return "".join((f"\n\t`{self.bot.command_prefix}{cmd.name}`: {cmd.brief}" 
+                        for cmd in cmds))
     
     __POLL_EMOJIS = (get_emoji(":one:"),   get_emoji(":two:"),   get_emoji(":three:"), 
                      get_emoji(":four:"),  get_emoji(":five:"),  get_emoji(":six:"), 
