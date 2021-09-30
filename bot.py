@@ -27,8 +27,8 @@ intents = discord.Intents.default()
 intents.members = True
 
 # Register all available cogs
-COGS = (f"cogs.{filename[:-3]}" for filename in os.listdir("./cogs")
-        if filename.endswith(".py") and filename != "base_cog.py")
+COGS = [f"cogs.{filename[:-3]}" for filename in os.listdir("./cogs")
+        if filename.endswith(".py") and filename != "base_cog.py"]
 
 ###############################################################################
 

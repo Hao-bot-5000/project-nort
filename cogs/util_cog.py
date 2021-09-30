@@ -43,7 +43,7 @@ class UtilCog(BaseCog):
             if isinstance(res, commands.Command):
                 reply += (
                     f"\n`{self.bot.command_prefix}{res.name}" +
-                    "".join((f" <{p}>" for p in list(res.clean_params.keys())[:-1])) +
+                    "".join(f" <{p}>" for p in list(res.clean_params.keys())[:-1]) +
                     f"`: {res.description}"
                 )
             else:
@@ -143,8 +143,8 @@ class UtilCog(BaseCog):
         return cmd
 
     def __command_list_to_string(self, cmds):
-        return "".join((f"\n\t`{self.bot.command_prefix}{cmd.name}`: {cmd.brief}"
-                        for cmd in cmds))
+        return "".join(f"\n\t`{self.bot.command_prefix}{cmd.name}`: {cmd.brief}"
+                       for cmd in cmds)
 
     __POLL_EMOJIS = (get_emoji(":one:"),   get_emoji(":two:"),   get_emoji(":three:"),
                      get_emoji(":four:"),  get_emoji(":five:"),  get_emoji(":six:"),
