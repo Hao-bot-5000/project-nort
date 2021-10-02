@@ -3,7 +3,7 @@ from discord.ext import commands
 
 from cogs.base_cog import BaseCog
 
-from utils import (JSON_DATA_PATH, get_json_data, set_json_data,
+from utils import (get_json_path, get_json_data, set_json_data,
                    get_emoji, get_mentioned_member, create_progress_bar,
                    create_black_embed)
 from custom_errors import MemberNotFoundError, TooManyArgumentsError, CustomCommandError
@@ -31,7 +31,8 @@ class ExpeditionCog(BaseCog):
         guild_id = str(ctx.guild.id)
 
         # Retrieve json contents
-        json_data = await get_json_data(JSON_DATA_PATH)
+        path = get_json_path("data")
+        json_data = await get_json_data(path)
         guild_data = json_data.get(guild_id, {})
         yc_members_data = guild_data.get("yc_members", {})
 
@@ -49,7 +50,7 @@ class ExpeditionCog(BaseCog):
         else:
             await ctx.send("Daily NortCoins already claimed!")
 
-        await set_json_data(JSON_DATA_PATH, json_data)
+        await set_json_data(path, json_data)
 
     ### Expedition Command ###
     @commands.command(
@@ -68,7 +69,8 @@ class ExpeditionCog(BaseCog):
         guild_id = str(ctx.guild.id)
 
         # Retrieve json contents
-        json_data = await get_json_data(JSON_DATA_PATH)
+        path = get_json_path("data")
+        json_data = await get_json_data(path)
         guild_data = json_data.get(guild_id, {})
         yc_members_data = guild_data.get("yc_members", {})
 
@@ -97,7 +99,7 @@ class ExpeditionCog(BaseCog):
             )
 
         author_data["on_expedition"] = 1
-        await set_json_data(JSON_DATA_PATH, json_data)
+        await set_json_data(get_json_path("data"), json_data)
         await ctx.send("Expedition started!")
 
         idx = self.__TIMES.index(timescale)
@@ -109,7 +111,7 @@ class ExpeditionCog(BaseCog):
         )
 
         author_data["on_expedition"] = 0
-        await set_json_data(JSON_DATA_PATH, json_data)
+        await set_json_data(get_json_path("data"), json_data)
         await ctx.send(f"{ctx.author.mention}\nYour expedition has completed!")
 
     def __add_coins(self, member_data, coin_type, amount):

@@ -10,7 +10,7 @@ from discord.ext                    import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from multiprocessing                import Process
 
-from utils                          import (JSON_DATA_PATH, get_json_data, set_json_data,
+from utils                          import (get_json_path, get_json_data, set_json_data,
                                             get_emoji)
 import custom_errors
 
@@ -93,14 +93,15 @@ def main():
             raise error
 
     async def handle_guilds(guild, is_joining):
-        json_data = await get_json_data(JSON_DATA_PATH)
+        path = get_json_path("data")
+        json_data = await get_json_data(path)
 
         if is_joining:
             json_data[guild.id] = {}
         else:
             json_data.pop(guild.id, None)
 
-        await set_json_data(JSON_DATA_PATH, json_data)
+        await set_json_data(path, json_data)
 
     @bot.event
     async def on_guild_join(guild):
