@@ -3,13 +3,15 @@ from discord.ext        import commands
 
 from cogs.base_cog      import BaseCog
 
-from utils              import (JSON_DATA_PATH, get_json_data, set_json_data,
+from utils              import (get_json_path, get_json_data, set_json_data,
                                 get_emoji, get_mentioned_member, create_progress_bar,
                                 create_black_embed)
 from custom_errors import TooManyArgumentsError
 
-from math import sin
-import time
+from numpy import random, cumprod, exp
+from math import sqrt
+from matplotlib import pyplot as plt
+from datetime import date
 
 class YashCoinCog(BaseCog):
     def __init__(self, bot):
@@ -30,7 +32,8 @@ class YashCoinCog(BaseCog):
         author_id = str(ctx.author.id)
 
         # Retrieve json contents
-        json_data = await get_json_data(JSON_DATA_PATH)
+        path = get_json_path("data")
+        json_data = await get_json_data(path)
         guild_data = json_data.setdefault(guild_id, {})
         yc_members_data = guild_data.setdefault("yc_members", {})
 
@@ -43,7 +46,7 @@ class YashCoinCog(BaseCog):
                 "prev_daily" : None,
                 "on_expedition": 0
             }
-            await set_json_data(JSON_DATA_PATH, json_data)
+            await set_json_data(path, json_data)
 
             reply = f"Thank you for joining YashCoin {get_emoji(':tm:')} Incorporated!"
         else:
@@ -123,10 +126,6 @@ class YashCoinCog(BaseCog):
         await ctx.send(embed=embed_reply)
 
     ### Stocks Command ###
-    __BASE_RATE = 1000
-    __FLUCTUATION = 100
-    __TIMESCALE = 3600
-    __SAMPLE = 60
     @commands.command(
         brief="Displays YashCoin values",
         description="Displays the current YashCoin conversion rate"
@@ -136,15 +135,17 @@ class YashCoinCog(BaseCog):
         if len(args) > 0:
             raise TooManyArgumentsError("stocks")
 
-        current_time = time.time()
-        previous_rate = int(self.__BASE_RATE + self.__FLUCTUATION * sin((current_time - self.__SAMPLE) / self.__TIMESCALE))
-        current_rate = int(self.__BASE_RATE + self.__FLUCTUATION * sin(current_time / self.__TIMESCALE))
+        path = get_json_path("yashcoin")
+        json_data = await get_json_data(path)
 
-        status = get_emoji(":arrow_up:"    if previous_rate < current_rate else
-                           ":arrow_down:"  if previous_rate > current_rate else #NOSONAR -- Ignoring nested ternary warning
-                           ":stop_button:")
+        today = str(date.today())
+        if json_data.setdefault("prev_check", None) != today:
+            json_data["prev_check"] = today
+            json_data["values"] = self.__get_yc_graph_values()
+            await set_json_data(path, json_data)
 
-        await ctx.send(f"Value: {current_rate} {status}")
+        
+        await ctx.send(file=discord.File("assets/plot.png"))
 
 
 
@@ -156,7 +157,8 @@ class YashCoinCog(BaseCog):
         guild_id = str(ctx.guild.id)
 
         # Retrieve json contents
-        json_data = await get_json_data(JSON_DATA_PATH)
+        path = get_json_path("data")
+        json_data = await get_json_data(path)
         guild_data = json_data.get(guild_id, None)
         yc_members_data = guild_data.get("yc_members", None) if guild_data else None
 
@@ -188,6 +190,24 @@ class YashCoinCog(BaseCog):
     def __get_cringe_status(self, percent):
         if percent == 0.69: return "Nice"
         return self.__CRINGE_STATUSES[int(percent * (len(self.__CRINGE_STATUSES) - 1))]
+
+    # NOTE: formula from https://stackoverflow.com/a/8609519
+    __BASE_PRICE = 1000 # NOTE: temporary value
+    __STEPS = 96
+    __MU = 0.05
+    __SIGMA = 0.2
+    def __get_yc_graph_values(self, steps=__STEPS, mu=__MU, sigma=__SIGMA):
+        dy = 1 / steps
+        dw = sqrt(dy) * random.randn(steps)
+        increments = (mu - sigma * sigma / 2) * dy + sigma * dw
+        values = [int(v) for v in self.__BASE_PRICE * cumprod(exp(increments))]
+
+        plt.clf()
+        plt.plot(values)
+        plt.title("YashCoin Stock Graph")
+        plt.savefig(fname="assets/plot")
+
+        return values
 
 
 def setup(bot):

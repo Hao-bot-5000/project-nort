@@ -9,3 +9,5 @@ pytz
 six
 tzlocal
 websockets
+numpy
+matplotlib
