@@ -74,7 +74,8 @@ async def try_upload_file(bot, channel, file_path, content=None,
 
 
 ### JSON Helpers ###
-JSON_DATA_PATH = "./assets/json/data.json"
+def get_json_path(fname):
+    return f"./assets/json/{fname}.json"
 
 # Retrieve json contents based on path URL
 # If file is not a valid JSON document, return an empty dictionary
