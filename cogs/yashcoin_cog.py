@@ -5,12 +5,11 @@ from cogs.base_cog      import BaseCog
 
 from utils              import (get_json_path, get_json_data, set_json_data,
                                 get_emoji, get_mentioned_member, create_progress_bar,
-                                create_black_embed)
+                                create_black_embed, create_graph)
 from custom_errors import TooManyArgumentsError
 
-from numpy import random, cumprod, exp
+from numpy import random, exp, cumprod
 from math import sqrt
-from matplotlib import pyplot as plt
 from datetime import date
 
 class YashCoinCog(BaseCog):
@@ -140,8 +139,12 @@ class YashCoinCog(BaseCog):
 
         today = str(date.today())
         if json_data.setdefault("prev_check", None) != today:
+            values = self.__get_yc_graph_values()
+            create_graph(values, color=self.__get_yc_graph_color(values[0], values[-1]))
+
             json_data["prev_check"] = today
-            json_data["values"] = self.__get_yc_graph_values()
+            json_data["values"] = values
+
             await set_json_data(path, json_data)
 
         
@@ -192,22 +195,22 @@ class YashCoinCog(BaseCog):
         return self.__CRINGE_STATUSES[int(percent * (len(self.__CRINGE_STATUSES) - 1))]
 
     # NOTE: formula from https://stackoverflow.com/a/8609519
-    __BASE_PRICE = 1000 # NOTE: temporary value
-    __STEPS = 96
-    __MU = 0.05
-    __SIGMA = 0.2
-    def __get_yc_graph_values(self, steps=__STEPS, mu=__MU, sigma=__SIGMA):
+    __BASE_PRICE = 1000
+    # initial    - starting value of graph
+    # steps      - number of values along the graph (not including initial)
+    # mu & sigma - constants that affect the values
+    def __get_yc_graph_values(self, initial=__BASE_PRICE, steps=96, mu=0.05, sigma=0.2):
         dy = 1 / steps
         dw = sqrt(dy) * random.randn(steps)
         increments = (mu - sigma * sigma / 2) * dy + sigma * dw
         values = [int(v) for v in self.__BASE_PRICE * cumprod(exp(increments))]
-
-        plt.clf()
-        plt.plot(values)
-        plt.title("YashCoin Stock Graph")
-        plt.savefig(fname="assets/plot")
-
-        return values
+        return [initial] + values
+    
+    def __get_yc_graph_color(self, start, end):
+        if start == end:
+            return "gray"
+        
+        return "green" if start < end else "red"
 
 
 def setup(bot):

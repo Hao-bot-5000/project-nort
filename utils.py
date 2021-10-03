@@ -4,6 +4,8 @@ from os         import remove
 import json
 import math
 
+from matplotlib import pyplot as plt
+
 from emoji      import emojize
 
 import discord
@@ -96,6 +98,25 @@ async def set_json_data(path, json_data):
     json_file = open(path, "w")
     json.dump(json_data, json_file, indent=4)
     json_file.close()
+
+
+
+### Graph Helpers ###
+def create_graph(values, **kwargs):
+    steps = len(values)
+
+    plt.clf()
+    plt.plot(values, **kwargs)
+    plt.fill_between(x=range(steps), y1=values, y2=[min(values)] * steps, 
+                     facecolor=kwargs.get("color", None), alpha=0.2)
+    axes = plt.gca()
+    axes.spines["top"].set_visible(False)
+    axes.spines["right"].set_visible(False)
+    plt.title("YashCoin Stock Graph")
+    # TODO: save graph in memory rather than onto the hard drive
+    #       https://stackoverflow.com/questions/60006794/send-image-from-memory
+    #       https://stackoverflow.com/questions/8598673/how-to-save-a-pylab-figure-into-in-memory-file-which-can-be-read-into-pil-image
+    plt.savefig(fname="assets/plot")
 
 
 
