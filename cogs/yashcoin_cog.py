@@ -165,7 +165,7 @@ class YashCoinCog(BaseCog):
         num_values = len(values)
 
         clock = datetime.now()
-        clock_idx = int(num_values * ((clock.hour + (clock.minute / 60)) / 24))
+        clock_idx = int(num_values * ((clock.hour + (clock.minute / 60)) / 24)) + 1
 
         current_values = values[:clock_idx]
         if get_simple_graph_value_count() < len(current_values):
