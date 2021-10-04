@@ -5,8 +5,8 @@ from cogs.base_cog      import BaseCog
 
 from utils              import (get_json_path, get_json_data, set_json_data,
                                 get_emoji, get_mentioned_member, create_progress_bar,
-                                create_black_embed, create_simple_graph, 
-                                update_simple_graph, get_simple_graph_value_count)
+                                create_black_embed, create_stock_graph, 
+                                update_stock_graph, get_stock_graph_value_count)
 from custom_errors import TooManyArgumentsError
 
 from numpy import random, exp, cumprod
@@ -138,38 +138,40 @@ class YashCoinCog(BaseCog):
         path = get_json_path("yashcoin")
         json_data = await get_json_data(path)
 
-        # Set up new graph for the new day
+        now = datetime.now()
         today = str(date.today())
-        if json_data.setdefault("prev_check", None) != today:
+
+        if json_data.get("prev_check", None) != today:
+            # Generate new graph for new day
             try:
                 old_values = json_data.get("values", [self.__BASE_PRICE])
-                new_values = self.__get_yc_graph_values(old_values[-1])
+                new_values = self.__generate_yc_values(old_values[-1])
                 if not isinstance(old_values, list): raise TypeError()
             except (TypeError, IndexError):
-                new_values = self.__get_yc_graph_values()
+                new_values = self.__generate_yc_values()
 
             json_data["prev_check"] = today
             json_data["values"] = new_values
 
-            self.__create_yc_graph(len(new_values))
-
             await set_json_data(path, json_data)
 
-        # Generate up-to-date graph
-        try:
-            values = json_data.get("values", [self.__BASE_PRICE])
-            if not isinstance(values, list): raise TypeError()
-        except TypeError:
-            values = [self.__BASE_PRICE]
+            indices = len(new_values)
+            current_values = new_values[:self.__get_clock_index(now, indices)]
 
-        num_values = len(values)
+            self.__create_yc_graph(current_values, indices)
+        else:
+            # Update graph values
+            try:
+                values = json_data.get("values", [self.__BASE_PRICE])
+                if not isinstance(values, list): raise TypeError()
+            except TypeError:
+                values = [self.__BASE_PRICE]
 
-        clock = datetime.now()
-        clock_idx = int(num_values * ((clock.hour + (clock.minute / 60)) / 24)) + 1
+            indices = len(values)
+            current_values = values[:self.__get_clock_index(now, indices)]
 
-        current_values = values[:clock_idx]
-        if get_simple_graph_value_count() < len(current_values):
-            self.__update_yc_graph(num_values, current_values)
+            if get_stock_graph_value_count() < len(current_values):
+                self.__update_yc_graph(current_values, indices)
 
         difference = current_values[-1] - current_values[0]
         percentage = difference / current_values[0]
@@ -184,7 +186,7 @@ class YashCoinCog(BaseCog):
         )
         embed_reply.add_field(
             name="**Date and Time**", 
-            value=f"`{clock.strftime('%b %d, %I:%M %p')} PT`", 
+            value=f"`{now.strftime('%b %d, %I:%M %p')} PT`", 
             inline=False
         )
         file = discord.File("assets/plot.png", filename="plot.png")
@@ -241,28 +243,32 @@ class YashCoinCog(BaseCog):
     # initial    - starting value of graph
     # steps      - number of values along the graph (not including initial)
     # mu & sigma - constants that affect the values
-    def __get_yc_graph_values(self, initial=__BASE_PRICE, steps=96, mu=0.05, sigma=0.2):
+    def __generate_yc_values(self, initial=__BASE_PRICE, steps=96, mu=0.05, sigma=0.2):
         dy = 1 / steps
         dw = sqrt(dy) * random.randn(steps)
         increments = (mu - sigma * sigma / 2) * dy + sigma * dw
         values = [int(v) for v in self.__BASE_PRICE * cumprod(exp(increments))]
         return [initial] + values
     
+    __X_PADDING = 0.05
+    def __create_yc_graph(self, values, indices):
+        xlim = (-self.__X_PADDING * indices, (1 + self.__X_PADDING) * indices)
+        color = self.__get_yc_graph_color(values[0], values[-1])
+        create_stock_graph(None, values, xlim=xlim, color=color)
+    
+    def __update_yc_graph(self, new_values, indices):
+        xlim = (-self.__X_PADDING * indices, (1 + self.__X_PADDING) * indices)
+        color = self.__get_yc_graph_color(new_values[0], new_values[-1])
+        update_stock_graph(None, new_values, xlim=xlim, color=color)
+
     def __get_yc_graph_color(self, start, end):
         if start == end:
             return "gray"
         
         return "green" if start < end else "red"
     
-    __X_PADDING = 0.05
-    def __create_yc_graph(self, num_values):
-        xlim = (-self.__X_PADDING * num_values, (1 + self.__X_PADDING) * num_values)
-        create_simple_graph(None, xlim=xlim)
-    
-    def __update_yc_graph(self, num_values, current_values):
-        xlim = (-self.__X_PADDING * num_values, (1 + self.__X_PADDING) * num_values)
-        color = self.__get_yc_graph_color(current_values[0], current_values[-1])
-        update_simple_graph(None, current_values, xlim=xlim, color=color)
+    def __get_clock_index(self, now, indices):
+        return int(indices * ((now.hour + (now.minute / 60)) / 24)) + 1
 
 
 def setup(bot):

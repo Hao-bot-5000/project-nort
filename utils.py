@@ -102,7 +102,7 @@ async def set_json_data(path, json_data):
 
 
 ### Graph Helpers ###
-def create_simple_graph(title, values=[], xlim=(), ylim=(), **kwargs):
+def create_stock_graph(title, values=[], xlim=(), ylim=(), **kwargs):
 
     plt.clf()
     plt.title(title)
@@ -119,19 +119,23 @@ def create_simple_graph(title, values=[], xlim=(), ylim=(), **kwargs):
     if len(xlim) > 0: axes.set_xlim(*xlim)
     if len(ylim) > 0: axes.set_ylim(*ylim)
 
-    plt.plot(values, **kwargs)
+    line = plt.plot(values, **kwargs)[0]
+
+    steps = len(values)
+    plt.fill_between(x=range(steps), y1=values, y2=[min(values)] * steps, 
+                     facecolor=line.get_color(), alpha=0.2)
 
     # TODO: save graph in memory rather than onto the hard drive
     #       https://stackoverflow.com/questions/60006794/send-image-from-memory
     #       https://stackoverflow.com/questions/8598673/how-to-save-a-pylab-figure-into-in-memory-file-which-can-be-read-into-pil-image
     plt.savefig(fname="assets/plot", transparent=True)
 
-def update_simple_graph(title, values, xlim=(), ylim=(), **kwargs):
+def update_stock_graph(title, values, xlim=(), ylim=(), **kwargs):
     steps = len(values)
     
     lines = plt.gca().get_lines()
     if not lines: # if graph is empty (no lines plotted), generate new graph
-        create_simple_graph(title, xlim=xlim, ylim=ylim, **kwargs)
+        create_stock_graph(title, xlim=xlim, ylim=ylim, **kwargs)
         lines = plt.gca().get_lines()
 
     # update line by inputs
@@ -156,7 +160,7 @@ def update_simple_graph(title, values, xlim=(), ylim=(), **kwargs):
     #       https://stackoverflow.com/questions/8598673/how-to-save-a-pylab-figure-into-in-memory-file-which-can-be-read-into-pil-image
     plt.savefig(fname="assets/plot", transparent=True)
 
-def get_simple_graph_value_count():
+def get_stock_graph_value_count():
     lines = plt.gca().get_lines()
     if not lines: return 0
     return len(lines[0].get_xdata())
