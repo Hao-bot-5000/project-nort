@@ -102,21 +102,64 @@ async def set_json_data(path, json_data):
 
 
 ### Graph Helpers ###
-def create_graph(values, **kwargs):
-    steps = len(values)
+def create_simple_graph(title, values=[], xlim=(), ylim=(), **kwargs):
 
     plt.clf()
-    plt.plot(values, **kwargs)
-    plt.fill_between(x=range(steps), y1=values, y2=[min(values)] * steps, 
-                     facecolor=kwargs.get("color", None), alpha=0.2)
+    plt.title(title)
     axes = plt.gca()
-    axes.spines["top"].set_visible(False)
-    axes.spines["right"].set_visible(False)
-    plt.title("YashCoin Stock Graph")
+    axes.spines.top.set_visible(False)
+    axes.spines.right.set_visible(False)
+    # Modify colors to be light and dark mode friendly
+    axes.spines.bottom.set_color("#777") 
+    axes.spines.left.set_color("#777")
+    axes.xaxis.label.set_color("#777")
+    axes.yaxis.label.set_color("#777")
+    axes.tick_params(colors="#777", which="both")
+
+    if len(xlim) > 0: axes.set_xlim(*xlim)
+    if len(ylim) > 0: axes.set_ylim(*ylim)
+
+    plt.plot(values, **kwargs)
+
     # TODO: save graph in memory rather than onto the hard drive
     #       https://stackoverflow.com/questions/60006794/send-image-from-memory
     #       https://stackoverflow.com/questions/8598673/how-to-save-a-pylab-figure-into-in-memory-file-which-can-be-read-into-pil-image
-    plt.savefig(fname="assets/plot")
+    plt.savefig(fname="assets/plot", transparent=True)
+
+def update_simple_graph(title, values, xlim=(), ylim=(), **kwargs):
+    steps = len(values)
+    
+    lines = plt.gca().get_lines()
+    if not lines: # if graph is empty (no lines plotted), generate new graph
+        create_simple_graph(title, xlim=xlim, ylim=ylim, **kwargs)
+        lines = plt.gca().get_lines()
+
+    # update line by inputs
+    line = lines[0]
+    line_color = kwargs.get("color", None)
+    if line_color is not None and line.get_color() != line_color:
+        try: line.set_color(line_color)
+        except ValueError: pass
+    line.set_xdata(range(steps))
+    line.set_ydata(values)
+    
+    # update area by inputs
+    # is it faster to remove and replace collections, or to update existing collections?
+    collections = plt.gca().collections
+    if collections:
+        plt.gca().collections.clear()
+    plt.fill_between(x=range(steps), y1=values, y2=[min(values)] * steps, 
+                     facecolor=line.get_color(), alpha=0.2)
+    
+    # TODO: save graph in memory rather than onto the hard drive
+    #       https://stackoverflow.com/questions/60006794/send-image-from-memory
+    #       https://stackoverflow.com/questions/8598673/how-to-save-a-pylab-figure-into-in-memory-file-which-can-be-read-into-pil-image
+    plt.savefig(fname="assets/plot", transparent=True)
+
+def get_simple_graph_value_count():
+    lines = plt.gca().get_lines()
+    if not lines: return 0
+    return len(lines[0].get_xdata())
 
 
 

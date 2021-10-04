@@ -5,12 +5,13 @@ from cogs.base_cog      import BaseCog
 
 from utils              import (get_json_path, get_json_data, set_json_data,
                                 get_emoji, get_mentioned_member, create_progress_bar,
-                                create_black_embed, create_graph)
+                                create_black_embed, create_simple_graph, 
+                                update_simple_graph, get_simple_graph_value_count)
 from custom_errors import TooManyArgumentsError
 
 from numpy import random, exp, cumprod
 from math import sqrt
-from datetime import date
+from datetime import datetime, date
 
 class YashCoinCog(BaseCog):
     def __init__(self, bot):
@@ -137,18 +138,48 @@ class YashCoinCog(BaseCog):
         path = get_json_path("yashcoin")
         json_data = await get_json_data(path)
 
+        # Set up new graph for the new day
         today = str(date.today())
         if json_data.setdefault("prev_check", None) != today:
             values = self.__get_yc_graph_values()
-            create_graph(values, color=self.__get_yc_graph_color(values[0], values[-1]))
-
             json_data["prev_check"] = today
             json_data["values"] = values
 
-            await set_json_data(path, json_data)
+            self.__create_yc_graph(len(values))
 
+            await set_json_data(path, json_data)
         
-        await ctx.send(file=discord.File("assets/plot.png"))
+        # Generate up-to-date graph
+        values = json_data.get("values", [self.__BASE_PRICE])
+        num_values = len(values)
+
+        clock = datetime.now()
+        clock_idx = int(num_values * ((clock.hour + (clock.minute / 60)) / 24))
+
+        current_values = values[:clock_idx] # TODO: current vlaues should get subset of values, up until "present time"
+        if get_simple_graph_value_count() < len(current_values):
+            self.__update_yc_graph(num_values, current_values)
+
+        difference = current_values[-1] - current_values[0]
+        percentage = difference / current_values[0]
+
+        embed_reply = create_black_embed()
+
+        embed_reply.title = "Market Summary — `YCSE: YSH`"
+        embed_reply.add_field(
+            name="**Value**", 
+            value=f"`{current_values[-1]} NRT` | `{difference:+d} ({percentage:+.2%})`", 
+            inline=False
+        )
+        embed_reply.add_field(
+            name="**Date and Time**", 
+            value=f"`{clock.strftime('%b %d, %I:%M %p')} PT`", 
+            inline=False
+        )
+        file = discord.File("assets/plot.png", filename="plot.png")
+        embed_reply.set_image(url="attachment://plot.png")
+
+        await ctx.send(file=file, embed=embed_reply)
 
 
 
@@ -211,6 +242,16 @@ class YashCoinCog(BaseCog):
             return "gray"
         
         return "green" if start < end else "red"
+    
+    __X_PADDING = 0.05
+    def __create_yc_graph(self, num_values):
+        xlim = (-self.__X_PADDING * num_values, (1 + self.__X_PADDING) * num_values)
+        create_simple_graph(None, xlim=xlim)
+    
+    def __update_yc_graph(self, num_values, current_values):
+        xlim = (-self.__X_PADDING * num_values, (1 + self.__X_PADDING) * num_values)
+        color = self.__get_yc_graph_color(current_values[0], current_values[-1])
+        update_simple_graph(None, current_values, xlim=xlim, color=color)
 
 
 def setup(bot):
