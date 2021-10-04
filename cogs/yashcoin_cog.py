@@ -141,22 +141,33 @@ class YashCoinCog(BaseCog):
         # Set up new graph for the new day
         today = str(date.today())
         if json_data.setdefault("prev_check", None) != today:
-            values = self.__get_yc_graph_values()
-            json_data["prev_check"] = today
-            json_data["values"] = values
+            try:
+                old_values = json_data.get("values", [self.__BASE_PRICE])
+                new_values = self.__get_yc_graph_values(old_values[-1])
+                if not isinstance(old_values, list): raise TypeError()
+            except (TypeError, IndexError):
+                new_values = self.__get_yc_graph_values()
 
-            self.__create_yc_graph(len(values))
+            json_data["prev_check"] = today
+            json_data["values"] = new_values
+
+            self.__create_yc_graph(len(new_values))
 
             await set_json_data(path, json_data)
-        
+
         # Generate up-to-date graph
-        values = json_data.get("values", [self.__BASE_PRICE])
+        try:
+            values = json_data.get("values", [self.__BASE_PRICE])
+            if not isinstance(values, list): raise TypeError()
+        except TypeError:
+            values = [self.__BASE_PRICE]
+
         num_values = len(values)
 
         clock = datetime.now()
         clock_idx = int(num_values * ((clock.hour + (clock.minute / 60)) / 24))
 
-        current_values = values[:clock_idx] # TODO: current vlaues should get subset of values, up until "present time"
+        current_values = values[:clock_idx]
         if get_simple_graph_value_count() < len(current_values):
             self.__update_yc_graph(num_values, current_values)
 
