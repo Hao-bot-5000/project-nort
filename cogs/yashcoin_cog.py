@@ -73,6 +73,14 @@ class YashCoinCog(BaseCog):
         nortcoins = member.get("data", {}).get("nort_coins", 0)
         yashcoins = member.get("data", {}).get("yash_coins", 0)
 
+        values = (await get_json_data(get_json_path("yashcoin"))).get("values", None)
+        
+        if not values:
+            await ctx.send("Stock data could not be found")
+            return
+
+        current_value = values[self.__get_clock_index(len(values))]
+
         embed_reply = create_black_embed()
 
         embed_reply.set_author(
@@ -80,14 +88,20 @@ class YashCoinCog(BaseCog):
             icon_url=member.get("icon", None)
         )
         embed_reply.add_field(
-            name=f"**YashCoins** {get_emoji(':moneybag:')}",
+            name=f"**YashCoins** {get_emoji(':coin:')}",
             value=f"`{yashcoins}`",
             inline=True
         )
         embed_reply.add_field(
-            name=f"**NortCoins** {get_emoji(':coin:')}",
+            name=f"**NortCoins** {get_emoji(':dollar:')}",
             value=f"`{nortcoins}`",
             inline=True
+        )
+        embed_reply.add_field(
+            name=f"**Total** {get_emoji(':moneybag:')}",
+            value=f"`{nortcoins + (yashcoins * current_value)} " +
+                  f"({nortcoins} NRT + {current_value}x{yashcoins} YSH)`", 
+            inline=False
         )
 
         await ctx.send(embed=embed_reply)
@@ -262,7 +276,7 @@ class YashCoinCog(BaseCog):
         member_id = str(member.id)
         member_data = yc_members_data.get(member_id, None) if yc_members_data else None
 
-        if member_data is None:
+        if not member_data:
             await ctx.send(
                 (f"{member.display_name} is " if member != ctx.author else "You are ") +
                 f"not a member of YashCoin{get_emoji(':tm:')} Incorporated"
@@ -312,7 +326,7 @@ class YashCoinCog(BaseCog):
     async def __handle_investment(self, ctx, amount):
         values = (await get_json_data(get_json_path("yashcoin"))).get("values", None)
 
-        if values is None:
+        if not values:
             await ctx.send("Stock data could not be found")
             return None
 
