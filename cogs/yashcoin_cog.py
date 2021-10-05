@@ -74,12 +74,12 @@ class YashCoinCog(BaseCog):
         yashcoins = member.get("data", {}).get("yash_coins", 0)
 
         values = (await get_json_data(get_json_path("yashcoin"))).get("values", None)
-        
+
         if not values:
             await ctx.send("Stock data could not be found")
             return
 
-        current_value = values[self.__get_clock_index(len(values))]
+        current_value = values[self.__get_clock_index(len(values), datetime.now())]
 
         embed_reply = create_black_embed()
 
@@ -330,7 +330,7 @@ class YashCoinCog(BaseCog):
             await ctx.send("Stock data could not be found")
             return None
 
-        current_value = values[self.__get_clock_index(len(values))]
+        current_value = values[self.__get_clock_index(len(values), datetime.now())]
 
         data_path = get_json_path("data")
         json_data = await get_json_data(data_path)
@@ -365,7 +365,7 @@ class YashCoinCog(BaseCog):
 
         return value
 
-    def __get_clock_index(self, indices, now=datetime.now()):
+    def __get_clock_index(self, indices, now):
         return int(indices * ((now.hour + (now.minute / 60)) / 24))
 
 
