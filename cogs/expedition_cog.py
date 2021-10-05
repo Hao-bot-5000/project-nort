@@ -60,7 +60,7 @@ class ExpeditionCog(BaseCog):
                     "(short, normal, long)"
     )
     @commands.guild_only()
-    async def expedition(self, ctx, timescale=None, *args):
+    async def expedition(self, ctx, timescale="short", *args):
         # Checking for arguements
         if len(args) > 0:
             raise TooManyArgumentsError("expedition")
@@ -78,9 +78,7 @@ class ExpeditionCog(BaseCog):
 
         if author_data is None:
             raise MemberNotFoundError()
-
-        if timescale is None: timescale = "short"
-
+        
         if author_data.get("on_expedition", 0) == 0:
             await self.__start_expedition(ctx, author_data, json_data, timescale)
         else:

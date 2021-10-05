@@ -94,19 +94,16 @@ class UtilCog(BaseCog):
         description="Generates a random number between 1 and the given number"
     )
     @commands.guild_only()
-    async def roll(self, ctx, value=None, *args):
+    async def roll(self, ctx, value=100, *args):
         if len(args) > 0:
             raise TooManyArgumentsError("roll")
 
-        if value is None:
-            value = 100
-        else:
-            try:
-                value = int(value)
-                if value < 1: raise ValueError()
-            except ValueError:
-                await ctx.send("Please provide a valid positive number")
-                return
+        try:
+            value = int(value)
+            if value < 1: raise ValueError()
+        except ValueError:
+            await ctx.send("Please provide a valid positive number")
+            return
 
         roll = randint(1, value)
         reply = f"{get_emoji(':game_die:')} You rolled **{roll}** out of **{value}**!"
