@@ -65,7 +65,7 @@ class YashCoinCog(BaseCog):
         if len(args) > 0:
             raise TooManyArgumentsError("balance")
 
-        member = await self.__get_yc_member(ctx, member if member else ctx.author, args)
+        member = await self.__get_yc_member(ctx, member if member else ctx.author)
 
         if member is None:
             return # Error messages are handled inside the private func
@@ -103,7 +103,7 @@ class YashCoinCog(BaseCog):
         if len(args) > 0:
             raise TooManyArgumentsError("cringemeter")
 
-        member = await self.__get_yc_member(ctx, member if member else ctx.author, args)
+        member = await self.__get_yc_member(ctx, member if member else ctx.author)
 
         if member is None:
             return # Error messages are handled inside the private func
@@ -156,7 +156,7 @@ class YashCoinCog(BaseCog):
             await set_json_data(path, json_data)
 
             indices = len(new_values)
-            current_values = new_values[:self.__get_clock_index(now, indices)]
+            current_values = new_values[:self.__get_clock_index(indices, now) + 1]
 
             self.__create_yc_graph(current_values, indices)
         else:
@@ -168,7 +168,7 @@ class YashCoinCog(BaseCog):
                 values = [self.__BASE_PRICE]
 
             indices = len(values)
-            current_values = values[:self.__get_clock_index(now, indices)]
+            current_values = values[:self.__get_clock_index(indices, now) + 1]
 
             if get_stock_graph_value_count() < len(current_values):
                 self.__update_yc_graph(current_values, indices)
@@ -194,13 +194,55 @@ class YashCoinCog(BaseCog):
 
         await ctx.send(file=file, embed=embed_reply)
 
+    ### Invest Command ###
+    @commands.command(
+        brief="Invest into YashCoin",
+        description="Buy the given number of YashCoin shares using NortCoins"
+    )
+    @commands.guild_only()
+    async def invest(self, ctx, amount=1, *args):
+        if len(args) > 0:
+            raise TooManyArgumentsError("invest")
+
+        try:
+            amount = int(amount)
+            if amount < 1: raise ValueError()
+        except ValueError:
+            await ctx.send("Please provide a valid positive number")
+            return
+
+        cost = await self.__handle_investment(ctx, amount)
+        if cost is not None:
+            await ctx.send(f"Thank you for investing `{cost}` NortCoins into YashCoin!")
+    
+    ### Divest Command ###
+    @commands.command(
+        brief="Divest from YashCoin",
+        description="Sell the given number of YashCoin shares for NortCoins"
+    )
+    @commands.guild_only()
+    async def divest(self, ctx, amount=1, *args):
+        if len(args) > 0:
+            raise TooManyArgumentsError("invest")
+
+        try:
+            amount = int(amount)
+            if amount < 1: raise ValueError()
+        except ValueError:
+            await ctx.send("Please provide a valid positive number")
+            return
+
+        value = await self.__handle_investment(ctx, -amount)
+        if value is not None:
+            await ctx.send(f"Thank you for trading in your `{-value}` NortCoins!")
+
 
 
     ### Private methods ###
     # Returns None if member cannot be found in the guild
     # Returns None if member is found in the guild, but not in the JSON file
     # Returns a dict containing the member's data and display name if member is found
-    async def __get_yc_member(self, ctx, member, args):
+    async def __get_yc_member(self, ctx, member):
         guild_id = str(ctx.guild.id)
 
         # Retrieve json contents
@@ -266,9 +308,51 @@ class YashCoinCog(BaseCog):
             return "gray"
         
         return "green" if start < end else "red"
-    
-    def __get_clock_index(self, now, indices):
-        return int(indices * ((now.hour + (now.minute / 60)) / 24)) + 1
+
+    async def __handle_investment(self, ctx, amount):
+        values = (await get_json_data(get_json_path("yashcoin"))).get("values", None)
+
+        if values is None:
+            await ctx.send("Stock data could not be found")
+            return None
+
+        current_value = values[self.__get_clock_index(len(values))]
+
+        data_path = get_json_path("data")
+        json_data = await get_json_data(data_path)
+        guild_data = json_data.setdefault(str(ctx.guild.id), {})
+        yc_members_data = guild_data.setdefault("yc_members", {})
+        member_data = yc_members_data.setdefault(str(ctx.author.id), {})
+
+        nortcoins = member_data.get("nort_coins", 0)
+        yashcoins = member_data.get("yash_coins", 0)
+
+        value = amount * current_value
+
+        if amount > 0 and nortcoins < value:
+            await ctx.send(
+                f"You do not have the required `{value}` " + 
+                "NortCoins to make this investment"
+            )
+            return None
+
+        if amount < 0 and yashcoins < -amount:
+            await ctx.send(
+                f"You do not have the required `{-amount}` " + 
+                "YashCoins to make this divestment"
+            )
+            return None
+
+        print(value, amount, yashcoins)
+        member_data["nort_coins"] = nortcoins - value
+        member_data["yash_coins"] = yashcoins + amount
+
+        await set_json_data(data_path, json_data)
+
+        return value
+
+    def __get_clock_index(self, indices, now=datetime.now()):
+        return int(indices * ((now.hour + (now.minute / 60)) / 24))
 
 
 def setup(bot):
