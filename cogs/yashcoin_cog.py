@@ -296,6 +296,8 @@ class YashCoinCog(BaseCog):
 
     # NOTE: formula from https://stackoverflow.com/a/8609519
     __BASE_PRICE = 1000
+    __MIN_SCALE = 300
+    __MAX_SCALE = 1500
     # initial    - starting value of graph
     # steps      - number of values along the graph (not including initial)
     # mu & sigma - constants that affect the values
@@ -303,7 +305,8 @@ class YashCoinCog(BaseCog):
         dy = 1 / steps
         dw = sqrt(dy) * random.randn(steps)
         increments = (mu - sigma * sigma / 2) * dy + sigma * dw
-        values = [int(v) for v in self.__BASE_PRICE * cumprod(exp(increments))]
+        scale = min(self.__MAX_SCALE, max(self.__MIN_SCALE, initial))
+        values = [int(v) for v in scale * cumprod(exp(increments))]
         return [initial] + values
     
     __X_PADDING = 0.05
