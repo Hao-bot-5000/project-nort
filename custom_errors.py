@@ -8,9 +8,3 @@ class TooManyArgumentsError(commands.CommandError):
 class MemberNotFoundError(commands.CommandError):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-# For throwing errors that have unique response messages
-class CustomCommandError(commands.CommandError):
-    def __init__(self, message, *args, **kwargs):
-        self.message = message
-        super().__init__(*args, **kwargs)

@@ -81,8 +81,6 @@ def main():
             await ctx.send(
                 f"You are not a member of YashCoin{get_emoji(':tm:')} Incorporated"
             )
-        elif isinstance(error, custom_errors.CustomCommandError):
-            await ctx.send(error.message)
         elif isinstance(error, ArgumentParsingError):
             await ctx.send(
                 f"You have entered an improper argument. Please make sure that " +

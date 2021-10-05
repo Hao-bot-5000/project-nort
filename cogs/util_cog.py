@@ -5,7 +5,7 @@ from cogs.base_cog      import BaseCog
 
 from random             import randint
 from utils              import get_emoji, create_black_embed
-from custom_errors      import CustomCommandError, TooManyArgumentsError
+from custom_errors      import TooManyArgumentsError
 
 class UtilCog(BaseCog):
     def __init__(self, bot):
@@ -71,11 +71,12 @@ class UtilCog(BaseCog):
 
         if message is None:
             sample_member = ctx.guild.owner.display_name
-            raise CustomCommandError(
+            await ctx.send(
                 f"Please input a message to vote on — for example: " +
                 f"`{self.bot.command_prefix}poll \"Is {sample_member} a real one?\" " +
                 "yes no`"
             )
+            return
 
         embed_reply = create_black_embed()
 
@@ -104,7 +105,8 @@ class UtilCog(BaseCog):
                 value = int(value)
                 if value < 1: raise ValueError()
             except ValueError:
-                raise CustomCommandError("Please provide a valid positive number")
+                await ctx.send("Please provide a valid positive number")
+                return
 
         roll = randint(1, value)
         reply = f"{get_emoji(':game_die:')} You rolled **{roll}** out of **{value}**!"

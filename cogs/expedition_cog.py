@@ -6,7 +6,7 @@ from cogs.base_cog import BaseCog
 from utils import (get_json_path, get_json_data, set_json_data,
                    get_emoji, get_mentioned_member, create_progress_bar,
                    create_black_embed)
-from custom_errors import MemberNotFoundError, TooManyArgumentsError, CustomCommandError
+from custom_errors import MemberNotFoundError, TooManyArgumentsError
 
 import asyncio
 
@@ -94,9 +94,8 @@ class ExpeditionCog(BaseCog):
     __DURATIONS = (10, 30, 90)
     async def __start_expedition(self, ctx, author_data, json_data, timescale):
         if timescale not in self.__TIMES:
-            raise CustomCommandError(
-                f"Please input a valid timescale ({', '.join(self.__TIMES)})"
-            )
+            await ctx.send(f"Please input a valid timescale ({', '.join(self.__TIMES)})")
+            return
 
         author_data["on_expedition"] = 1
         await set_json_data(get_json_path("data"), json_data)
