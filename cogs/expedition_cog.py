@@ -19,8 +19,8 @@ class ExpeditionCog(BaseCog):
 
     ### Daily Claim Command ###
     @commands.command(
-        brief="Claim 600 daily NortCoins",
-        description="Claim 600 daily NortCoins every day (PST Time)"
+        brief="Claim 600 daily NortBucks",
+        description="Claim 600 daily NortBucks every day (PST Time)"
     )
     @commands.guild_only()
     async def daily(self, ctx, *args):
@@ -44,18 +44,18 @@ class ExpeditionCog(BaseCog):
         today = str(date.today())
         if author_data.get("prev_daily", None) != today:
 
-            author_data["nort_coins"] = self.__add_coins(author_data, "nort_coins", 600)
+            author_data["nort_bucks"] = self.__add_coins(author_data, "nort_bucks", 600)
             author_data["prev_daily"] = today
-            await ctx.send("Daily NortCoins successfully claimed!")
+            await ctx.send("Daily NortBucks successfully claimed!")
         else:
-            await ctx.send("Daily NortCoins already claimed!")
+            await ctx.send("Daily NortBucks already claimed!")
 
         await set_json_data(path, json_data)
 
     ### Expedition Command ###
     @commands.command(
         aliases=["exp", "quest"],
-        brief="Go on expedition to find NortCoins",
+        brief="Go on expedition to find NortBucks",
         description="Start an expedition based on the given timescale "
                     "(short, normal, long)"
     )
@@ -103,8 +103,8 @@ class ExpeditionCog(BaseCog):
 
         await asyncio.sleep(self.__DURATIONS[idx])
 
-        author_data["nort_coins"] = self.__add_coins(
-            author_data, "nort_coins", self.__REWARDS[idx]
+        author_data["nort_bucks"] = self.__add_coins(
+            author_data, "nort_bucks", self.__REWARDS[idx]
         )
 
         author_data["on_expedition"] = 0

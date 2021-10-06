@@ -40,7 +40,7 @@ class YashCoinCog(BaseCog):
         # Update contents of json file if author id does not yet exist
         if author_id not in yc_members_data:
             yc_members_data[author_id] = {
-                "nort_coins" : 0,
+                "nort_bucks" : 0,
                 "yash_coins" : 0,
                 "cringe_meter" : 0,
                 "prev_daily" : None,
@@ -70,7 +70,7 @@ class YashCoinCog(BaseCog):
         if member is None:
             return # Error messages are handled inside the private func
 
-        nortcoins = member.get("data", {}).get("nort_coins", 0)
+        nortcoins = member.get("data", {}).get("nort_bucks", 0)
         yashcoins = member.get("data", {}).get("yash_coins", 0)
 
         values = (await get_json_data(get_json_path("yashcoin"))).get("values", None)
@@ -93,7 +93,7 @@ class YashCoinCog(BaseCog):
             inline=True
         )
         embed_reply.add_field(
-            name=f"**NortCoins** {get_emoji(':dollar:')}",
+            name=f"**NortBucks** {get_emoji(':dollar:')}",
             value=f"`{nortcoins}`",
             inline=True
         )
@@ -213,7 +213,7 @@ class YashCoinCog(BaseCog):
     @commands.command(
         aliases=["buy"],
         brief="Invest into YashCoin",
-        description="Buy the given number of YashCoin shares using NortCoins"
+        description="Buy the given number of YashCoin shares using NortBucks"
     )
     @commands.guild_only()
     async def invest(self, ctx, amount=1, *args):
@@ -229,13 +229,13 @@ class YashCoinCog(BaseCog):
 
         cost = await self.__handle_investment(ctx, amount)
         if cost is not None:
-            await ctx.send(f"Thank you for investing `{cost}` NortCoins into YashCoin!")
+            await ctx.send(f"Thank you for investing `{cost}` NortBucks into YashCoin!")
     
     ### Divest Command ###
     @commands.command(
         aliases=["sell"],
         brief="Divest from YashCoin",
-        description="Sell the given number of YashCoin shares for NortCoins"
+        description="Sell the given number of YashCoin shares for NortBucks"
     )
     @commands.guild_only()
     async def divest(self, ctx, amount=1, *args):
@@ -251,7 +251,7 @@ class YashCoinCog(BaseCog):
 
         value = await self.__handle_investment(ctx, -amount)
         if value is not None:
-            await ctx.send(f"Thank you for trading in your `{-value}` NortCoins!")
+            await ctx.send(f"Thank you for trading in your `{-value}` NortBucks!")
 
 
 
@@ -344,7 +344,7 @@ class YashCoinCog(BaseCog):
         yc_members_data = guild_data.setdefault("yc_members", {})
         member_data = yc_members_data.setdefault(str(ctx.author.id), {})
 
-        nortcoins = member_data.get("nort_coins", 0)
+        nortcoins = member_data.get("nort_bucks", 0)
         yashcoins = member_data.get("yash_coins", 0)
 
         value = amount * current_value
@@ -352,7 +352,7 @@ class YashCoinCog(BaseCog):
         if amount > 0 and nortcoins < value:
             await ctx.send(
                 f"You do not have the required `{value}` " + 
-                "NortCoins to make this investment"
+                "NortBucks to make this investment"
             )
             return None
 
@@ -364,7 +364,7 @@ class YashCoinCog(BaseCog):
             return None
 
         print(value, amount, yashcoins)
-        member_data["nort_coins"] = nortcoins - value
+        member_data["nort_bucks"] = nortcoins - value
         member_data["yash_coins"] = yashcoins + amount
 
         await set_json_data(data_path, json_data)
