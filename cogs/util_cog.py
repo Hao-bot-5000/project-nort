@@ -46,6 +46,8 @@ class UtilCog(BaseCog):
                     "".join(f" <{p}>" for p in list(res.clean_params.keys())[:-1]) +
                     f"`: {res.description}"
                 )
+                if len(res.aliases) > 0:
+                    reply += f"\n\nAliases: `{', '.join(a for a in res.aliases)}`"
             else:
                 reply += (
                     f"\n**{res.category}**:" +
