@@ -141,6 +141,7 @@ class YashCoinCog(BaseCog):
 
     ### Stocks Command ###
     @commands.command(
+        aliases=["stonks"],
         brief="Displays YashCoin values",
         description="Displays the current YashCoin conversion rate"
     )
@@ -210,6 +211,7 @@ class YashCoinCog(BaseCog):
 
     ### Invest Command ###
     @commands.command(
+        aliases=["buy"],
         brief="Invest into YashCoin",
         description="Buy the given number of YashCoin shares using NortCoins"
     )
@@ -231,6 +233,7 @@ class YashCoinCog(BaseCog):
     
     ### Divest Command ###
     @commands.command(
+        aliases=["sell"],
         brief="Divest from YashCoin",
         description="Sell the given number of YashCoin shares for NortCoins"
     )
