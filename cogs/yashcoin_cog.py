@@ -216,12 +216,12 @@ class YashCoinCog(BaseCog):
         description="Buy the given number of YashCoin shares using NortBucks"
     )
     @commands.guild_only()
-    async def invest(self, ctx, amount=1, *args):
+    async def invest(self, ctx, amount=None, *args):
         if len(args) > 0:
             raise TooManyArgumentsError("invest")
 
         try:
-            amount = int(amount)
+            amount = int(amount) if amount is not None else 1
             if amount < 1: raise ValueError()
         except ValueError:
             await ctx.send("Please provide a valid positive number")
@@ -238,12 +238,12 @@ class YashCoinCog(BaseCog):
         description="Sell the given number of YashCoin shares for NortBucks"
     )
     @commands.guild_only()
-    async def divest(self, ctx, amount=1, *args):
+    async def divest(self, ctx, amount=None, *args):
         if len(args) > 0:
             raise TooManyArgumentsError("invest")
 
         try:
-            amount = int(amount)
+            amount = int(amount) if amount is not None else 1
             if amount < 1: raise ValueError()
         except ValueError:
             await ctx.send("Please provide a valid positive number")

@@ -96,12 +96,12 @@ class UtilCog(BaseCog):
         description="Generates a random number between 1 and the given number"
     )
     @commands.guild_only()
-    async def roll(self, ctx, value=100, *args):
+    async def roll(self, ctx, value=None, *args):
         if len(args) > 0:
             raise TooManyArgumentsError("roll")
 
         try:
-            value = int(value)
+            value = int(value) if value is not None else 100
             if value < 1: raise ValueError()
         except ValueError:
             await ctx.send("Please provide a valid positive number")
