@@ -9,7 +9,7 @@ from utils              import (get_json_path, get_json_data, set_json_data,
                                 update_stock_graph, get_stock_graph_value_count)
 from custom_errors import TooManyArgumentsError
 
-from numpy import random, exp, cumprod
+from numpy import random, exp, linspace, cumprod
 from math import sqrt
 from datetime import datetime, date
 
@@ -299,8 +299,6 @@ class YashCoinCog(BaseCog):
 
     # NOTE: formula from https://stackoverflow.com/a/8609519
     __BASE_PRICE = 1000
-    __MIN_SCALE = 300
-    __MAX_SCALE = 1500
     # initial    - starting value of graph
     # steps      - number of values along the graph (not including initial)
     # mu & sigma - constants that affect the values
@@ -308,10 +306,25 @@ class YashCoinCog(BaseCog):
         dy = 1 / steps
         dw = sqrt(dy) * random.randn(steps)
         increments = (mu - sigma * sigma / 2) * dy + sigma * dw
-        scale = min(self.__MAX_SCALE, max(self.__MIN_SCALE, initial))
-        values = [int(v) for v in scale * cumprod(exp(increments))]
+        scales = self.__generate_yc_scales(initial, steps)
+        print(len(scales))
+        values = [int(s * v) for s, v in zip(scales, cumprod(exp(increments)))]
         return [initial] + values
-    
+
+    # NOTE: min/max do not represent the highest/lowest values possible, but are rather
+    #       soft limitations that prevent the values from becoming overly large/small,
+    #       i.e. the graph ends at 2100 one day, but drops to 1700 the next day
+    __MIN_SCALE = 500
+    __MAX_SCALE = 1500
+    # initial   - starting value of graph
+    # min       - value where scales self-correct towards if initial is less than
+    # max       - value where scales self-correct towards if initial is greater than
+    def __generate_yc_scales(self, initial, steps, min=__MIN_SCALE, max=__MAX_SCALE):
+        if initial < max and initial > min:
+            return [initial] * steps
+
+        return linspace(initial, max if initial > max else min, steps).tolist()
+
     __X_PADDING = 0.05
     def __create_yc_graph(self, values, indices):
         xlim = (-self.__X_PADDING * indices, (1 + self.__X_PADDING) * indices)
