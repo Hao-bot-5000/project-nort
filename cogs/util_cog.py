@@ -40,6 +40,9 @@ class UtilCog(BaseCog):
         else:
             res = await self.__get_command_or_cog(ctx, command)
 
+            if res is None:
+                return
+
             if isinstance(res, commands.Command):
                 reply += (
                     f"\n`{self.bot.command_prefix}{res.name}" +
@@ -129,19 +132,18 @@ class UtilCog(BaseCog):
     ### Private methods ###
     async def __get_command_or_cog(self, ctx, name):
         cmd = self.bot.get_command(name)
-        if cmd is None:
-            cog = next((c for c in self.bot.cogs.values() if c.category == name), None)
-            if cog is None:
-                await ctx.send(
-                    f"No command or category called '{name}' found; run " +
-                    f"`{self.bot.command_prefix}help` for the list of all " +
-                    "available commands and categories"
-                )
-                return None
 
-            return cog
+        if cmd is not None:
+            return cmd
 
-        return cmd
+        cog = next((c for c in self.bot.cogs.values() if c.category == name), None)
+        if cog is None:
+            await ctx.send(
+                f"No command or category called '{name}' found; run " +
+                f"`{self.bot.command_prefix}help` for the list of all " +
+                "available commands and categories"
+            )
+        return cog
 
     def __command_list_to_string(self, cmds):
         return "".join(f"\n\t`{self.bot.command_prefix}{cmd.name}`: {cmd.brief}"

@@ -88,6 +88,7 @@ def main():
             )
             print(error) # in case it isn't just an issue with improper quotation marks
         else:
+            await ctx.send("Something went wrong...")
             raise error
 
     async def handle_guilds(guild, is_joining):
