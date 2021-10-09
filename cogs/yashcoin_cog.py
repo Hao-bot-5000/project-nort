@@ -7,7 +7,7 @@ from utils              import (get_json_path, get_json_data, set_json_data,
                                 get_emoji, get_mentioned_member, create_progress_bar,
                                 create_black_embed, create_stock_graph, 
                                 update_stock_graph, get_stock_graph_value_count)
-from custom_errors import TooManyArgumentsError
+from custom_errors import TooManyArgumentsError, MemberNotFoundError
 
 from numpy import random, exp, linspace, cumprod
 from math import sqrt
@@ -307,7 +307,6 @@ class YashCoinCog(BaseCog):
         dw = sqrt(dy) * random.randn(steps)
         increments = (mu - sigma * sigma / 2) * dy + sigma * dw
         scales = self.__generate_yc_scales(initial, steps)
-        print(len(scales))
         values = [int(s * v) for s, v in zip(scales, cumprod(exp(increments)))]
         return [initial] + values
 
@@ -355,7 +354,10 @@ class YashCoinCog(BaseCog):
         json_data = await get_json_data(data_path)
         guild_data = json_data.setdefault(str(ctx.guild.id), {})
         yc_members_data = guild_data.setdefault("yc_members", {})
-        member_data = yc_members_data.setdefault(str(ctx.author.id), {})
+        member_data = yc_members_data.get(str(ctx.author.id), None)
+
+        if member_data is None:
+            raise MemberNotFoundError()
 
         nortcoins = member_data.get("nort_bucks", 0)
         yashcoins = member_data.get("yash_coins", 0)
