@@ -78,8 +78,11 @@ def main():
                 "on this command"
             )
         elif isinstance(error, custom_errors.MemberNotFoundError):
+            await ctx.send(f"Member {error.member} could not be found in this server")
+        elif isinstance(error, custom_errors.InvalidTypeError):
             await ctx.send(
-                f"You are not a member of YashCoin{get_emoji(':tm:')} Incorporated"
+                "You have entered an invalid argument. Please make sure that your " + 
+                f"argument is a valid {error.type}"
             )
         elif isinstance(error, ArgumentParsingError):
             await ctx.send(
