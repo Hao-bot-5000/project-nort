@@ -68,6 +68,10 @@ class BaseCog(commands.Cog):
 
         return member_list_data.get(str(member.id)) is not None
 
+    async def add_reactions(self, message, *emojis):
+        for emoji in emojis:
+            await message.add_reaction(emoji)  
+
     @staticmethod
     def create_embed():
         return discord.Embed(color=0x010101)
