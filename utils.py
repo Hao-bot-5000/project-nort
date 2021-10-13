@@ -196,6 +196,12 @@ def dict_get_as_int(data: dict, key: str, default: int=0):
     except ValueError:
         return default
 
+def dict_get_as_list(data: dict, key: str, default: list=[]):
+    try:
+        return list(data.get(key, default))
+    except ValueError:
+        return default
+
 
 # Returns a 2-tuple containing the percentage number and the progress bar
 # If the input is not a number, raise an error

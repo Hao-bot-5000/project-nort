@@ -6,9 +6,9 @@ from numpy              import random, exp, linspace, cumprod
 from math               import sqrt
 
 from utils              import (get_json_path, get_json_data, set_json_data,
-                                create_simple_graph, update_simple_graph,
-                                get_simple_graph_num_points, get_emoji,
-                                get_mentioned_member, dict_get_as_int)
+                                get_emoji, create_simple_graph, update_simple_graph,
+                                get_simple_graph_num_points, get_mentioned_member, 
+                                dict_get_as_int, dict_get_as_list)
 
 from cogs.base_cog      import BaseCog
 from custom_errors      import TooManyArgumentsError, MemberNotFoundError
@@ -171,10 +171,10 @@ class EconomyCog(BaseCog):
     async def get_yash_coin_values(self, yash_coin_data=None):
         if yash_coin_data is None:
             yash_coin_data = await get_json_data(self.yash_coin_path)
-        yash_coin_values = yash_coin_data.get("values")
 
-        if not yash_coin_values or not isinstance(yash_coin_values, list):
-            raise ValueError("YashCoin data could not be properly retrieved")
+        yash_coin_values = dict_get_as_list(yash_coin_data, "values")
+        if not yash_coin_values:
+            raise ValueError("YashCoin values could not be properly retrieved")
 
         return yash_coin_values
     
