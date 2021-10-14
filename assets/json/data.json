@@ -2,24 +2,31 @@
     "648050887918354442": {
         "yc_members": {
             "149394827962744832": {
-                "nort_coins": 0,
-                "yash_coins": 0,
+                "nort_bucks": 3146,
+                "yash_coins": 3,
                 "cringe_meter": 0,
-                "prev_daily": "-1",
+                "prev_daily": "2021-10-13",
                 "on_expedition": 0
             },
             "466898187001528321": {
-                "nort_coins": 600,
+                "nort_bucks": 600,
                 "yash_coins": 0,
                 "cringe_meter": 0,
                 "prev_daily": "2021-09-27",
-                "on_expedition": 1
+                "on_expedition": 0
             },
             "244353173601517568": {
-                "nort_coins": 1400,
+                "nort_bucks": 1400,
                 "yash_coins": 0,
                 "cringe_meter": 0,
                 "prev_daily": "2021-09-29",
+                "on_expedition": 0
+            },
+            "280538105168265216": {
+                "nort_bucks": 100,
+                "yash_coins": 0,
+                "cringe_meter": 0,
+                "prev_daily": null,
                 "on_expedition": 0
             }
         }
@@ -27,11 +34,49 @@
     "882791475165941761": {
         "yc_members": {
             "466898187001528321": {
-                "nort_coins": 600,
+                "nort_bucks": 898,
+                "yash_coins": 1,
+                "cringe_meter": 0,
+                "prev_daily": "2021-10-13",
+                "on_expedition": 0
+            },
+            "149394827962744832": {
+                "nort_bucks": 34975,
+                "yash_coins": 0,
+                "on_expedition": 0,
+                "prev_daily": "2021-10-06"
+            },
+            "280538105168265216": {
+                "nort_bucks": 2947,
                 "yash_coins": 0,
                 "cringe_meter": 0,
-                "prev_daily": "2021-09-27",
-                "on_expedition": 1
+                "prev_daily": "2021-10-06",
+                "on_expedition": 0
+            },
+            "173967921020796928": {
+                "nort_bucks": 1900,
+                "yash_coins": 0,
+                "cringe_meter": 0,
+                "prev_daily": "2021-10-06",
+                "on_expedition": 0
+            },
+            "142852558531067904": {
+                "nort_bucks": 3900,
+                "yash_coins": 0,
+                "cringe_meter": 0,
+                "prev_daily": "2021-10-06",
+                "on_expedition": 0
+            },
+            "244353173601517568": {
+                "nort_bucks": 23078,
+                "yash_coins": 0,
+                "cringe_meter": 0,
+                "prev_daily": "2021-10-13",
+                "on_expedition": 0
+            },
+            "244552920412979204": {
+                "nort_bucks": 600,
+                "prev_daily": "2021-10-13"
             }
         }
     }

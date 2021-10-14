@@ -1,0 +1,8 @@
+{
+    "expedition": {
+        "num_variations": 3,
+        "difficulty": ["short", "normal", "long"],
+        "duration": [10, 30, 90],
+        "reward": [100, 250, 700]
+    }
+}
