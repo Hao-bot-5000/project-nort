@@ -196,6 +196,12 @@ def dict_get_as_int(data: dict, key: str, default: int=0):
     except ValueError:
         return default
 
+def dict_get_as_float(data: dict, key: str, default: float=0):
+    try:
+        return float(data.get(key, default))
+    except ValueError:
+        return default
+
 def dict_get_as_list(data: dict, key: str, default: list=[]):
     try:
         return list(data.get(key, default))
