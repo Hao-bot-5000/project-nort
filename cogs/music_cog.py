@@ -32,7 +32,7 @@ class MusicCog(BaseCog):
             await ctx.send("NortBot is in a different voice channel")
 
     @commands.command(
-        aliases=["s"],
+        aliases=["s", "l", "leave"],
         brief="Stops music",
         description="Stops music and leaves the channel"
     )
