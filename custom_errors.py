@@ -6,5 +6,11 @@ class TooManyArgumentsError(commands.CommandError):
         super().__init__(*args, **kwargs)
 
 class MemberNotFoundError(commands.CommandError):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, member, *args, **kwargs):
+        self.member = member
+        super().__init__(*args, **kwargs)
+
+class InvalidTypeError(commands.CommandError):
+    def __init__(self, type, *args, **kwargs):
+        self.type = type
         super().__init__(*args, **kwargs)

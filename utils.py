@@ -3,7 +3,6 @@ from os         import remove
 
 import json
 import math
-
 from matplotlib import pyplot as plt
 
 from emoji      import emojize
@@ -102,40 +101,41 @@ async def set_json_data(path, json_data):
 
 
 ### Graph Helpers ###
-def create_stock_graph(title, values=[], xlim=(), ylim=(), **kwargs):
-
+def create_simple_graph(title, values=[], xlim=(), ylim=(), 
+                        graph_color="#777", gradient=True, **kwargs):
     plt.clf()
     plt.title(title)
     axes = plt.gca()
     axes.spines.top.set_visible(False)
     axes.spines.right.set_visible(False)
     # Modify colors to be light and dark mode friendly
-    axes.spines.bottom.set_color("#777") 
-    axes.spines.left.set_color("#777")
-    axes.xaxis.label.set_color("#777")
-    axes.yaxis.label.set_color("#777")
-    axes.tick_params(colors="#777", which="both")
+    axes.spines.bottom.set_color(graph_color) 
+    axes.spines.left.set_color(graph_color)
+    axes.xaxis.label.set_color(graph_color)
+    axes.yaxis.label.set_color(graph_color)
+    axes.tick_params(colors=graph_color, which="both")
 
     if len(xlim) > 0: axes.set_xlim(*xlim)
     if len(ylim) > 0: axes.set_ylim(*ylim)
 
     line = plt.plot(values, **kwargs)[0]
 
-    steps = len(values)
-    plt.fill_between(x=range(steps), y1=values, y2=[min(values)] * steps, 
-                     facecolor=line.get_color(), alpha=0.2)
+    if gradient:
+        steps = len(values)
+        plt.fill_between(x=range(steps), y1=values, y2=[min(values)] * steps, 
+                         facecolor=line.get_color(), alpha=0.2)
 
     # TODO: save graph in memory rather than onto the hard drive
     #       https://stackoverflow.com/questions/60006794/send-image-from-memory
     #       https://stackoverflow.com/questions/8598673/how-to-save-a-pylab-figure-into-in-memory-file-which-can-be-read-into-pil-image
     plt.savefig(fname="assets/plot", transparent=True)
 
-def update_stock_graph(title, values, xlim=(), ylim=(), **kwargs):
+def update_simple_graph(title, values, xlim=(), ylim=(), gradient=True, **kwargs):
     steps = len(values)
-    
+
     lines = plt.gca().get_lines()
     if not lines: # if graph is empty (no lines plotted), generate new graph
-        create_stock_graph(title, values, xlim=xlim, ylim=ylim, **kwargs)
+        create_simple_graph(title, values, xlim=xlim, ylim=ylim, gradient=gradient, **kwargs)
     else:
         # update line by inputs
         line = lines[0]
@@ -145,24 +145,27 @@ def update_stock_graph(title, values, xlim=(), ylim=(), **kwargs):
             except ValueError: pass
         line.set_xdata(range(steps))
         line.set_ydata(values)
-        
+
         # update area by inputs
         # is it faster to remove and replace collections, or to update existing collections?
-        collections = plt.gca().collections
-        if collections:
-            plt.gca().collections.clear()
-        plt.fill_between(x=range(steps), y1=values, y2=[min(values)] * steps, 
-                        facecolor=line.get_color(), alpha=0.2)
-        
+        if gradient:
+            collections = plt.gca().collections
+            if collections:
+                plt.gca().collections.clear()
+            plt.fill_between(x=range(steps), y1=values, y2=[min(values)] * steps, 
+                             facecolor=line.get_color(), alpha=0.2)
+
         # TODO: save graph in memory rather than onto the hard drive
         #       https://stackoverflow.com/questions/60006794/send-image-from-memory
         #       https://stackoverflow.com/questions/8598673/how-to-save-a-pylab-figure-into-in-memory-file-which-can-be-read-into-pil-image
         plt.savefig(fname="assets/plot", transparent=True)
 
-def get_stock_graph_value_count():
-    lines = plt.gca().get_lines()
-    if not lines: return 0
-    return len(lines[0].get_xdata())
+def get_simple_graph_num_points():
+    count = 0
+    for line in plt.gca().get_lines():
+        count += len(line.get_xdata())
+
+    return count
 
 
 
@@ -179,7 +182,7 @@ async def get_mentioned_member(message, backup):
     if not member:
         try:
             member = await guild.get_member(int(backup))
-        except Exception:
+        except ValueError:
             pass
 
     return member
@@ -187,19 +190,36 @@ async def get_mentioned_member(message, backup):
 
 
 ### ETC ###
-NUM_BARS = 25
+def dict_get_as_int(data: dict, key: str, default: int=0):
+    try:
+        return int(data.get(key, default))
+    except ValueError:
+        return default
+
+def dict_get_as_float(data: dict, key: str, default: float=0):
+    try:
+        return float(data.get(key, default))
+    except ValueError:
+        return default
+
+def dict_get_as_list(data: dict, key: str, default: list=[]):
+    try:
+        return list(data.get(key, default))
+    except ValueError:
+        return default
+
 
 # Returns a 2-tuple containing the percentage number and the progress bar
 # If the input is not a number, raise an error
+NUM_BARS = 25
 def create_progress_bar(percentage):
     if not isinstance(percentage, (int, float)):
         raise TypeError("input must be a number")
 
     percentage = min(1, max(0, percentage))
 
-    bars = "\u25a0" * math.floor(percentage * NUM_BARS) + " " * math.ceil((1 - percentage) * NUM_BARS)
+    bars = (
+        "\u25a0" * math.floor(percentage * NUM_BARS) + 
+        " " * math.ceil((1 - percentage) * NUM_BARS)
+    )
     return (int(percentage * 100), f"[{bars}]")
-
-# Returns an Embed object with a black bar
-def create_black_embed():
-    return discord.Embed(color=0x010101)
