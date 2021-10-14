@@ -15,6 +15,7 @@ from custom_errors      import TooManyArgumentsError, MemberNotFoundError
 
 class EconomyCog(BaseCog):
     def __init__(self, bot):
+        self.graph_url = None
         self.yash_coin_path = get_json_path("yash_coin")
         super().__init__(bot, category="Economy")
 
@@ -102,7 +103,7 @@ class EconomyCog(BaseCog):
             indices = len(new_values)
             current_values = new_values[:self.get_current_yash_coin_index(indices) + 1]
 
-            self.create_yash_coin_graph(current_values, indices)
+            buffer = self.create_yash_coin_graph(current_values, indices)
         else:
             # Update graph values
             try:
@@ -114,7 +115,9 @@ class EconomyCog(BaseCog):
             current_values = values[:self.get_current_yash_coin_index(indices) + 1]
 
             if get_simple_graph_num_points() < len(current_values):
-                self.update_yash_coin_graph(current_values, indices)
+                buffer = self.update_yash_coin_graph(current_values, indices)
+            else:
+                buffer = None
 
         difference = current_values[-1] - current_values[0]
         percentage = difference / current_values[0]
@@ -131,10 +134,17 @@ class EconomyCog(BaseCog):
             value=f"`{now.strftime('%b %d, %I:%M %p')} PT`",
             inline=False
         )
-        file = discord.File("assets/plot.png", filename="plot.png")
-        embed_reply.set_image(url="attachment://plot.png")
+        
+        if not buffer:
+            embed_reply.set_image(url=self.graph_url)
+            await ctx.send(embed=embed_reply)
+        else:
+            file = discord.File(buffer, filename="plot.png")
+            embed_reply.set_image(url="attachment://plot.png")
+            message = await ctx.send(file=file, embed=embed_reply)
+            self.graph_url = message.embeds[0].image.url
 
-        await ctx.send(file=file, embed=embed_reply)
+
 
     ### Invest Command ###
     @commands.command(
@@ -199,11 +209,11 @@ class EconomyCog(BaseCog):
 
     def create_yash_coin_graph(self, values, indices):
         color = self.get_yash_coin_line_color(values[0], values[-1])
-        create_simple_graph(None, values, xlim=(0, indices), color=color)
+        return create_simple_graph(None, values, xlim=(0, indices), color=color)
     
     def update_yash_coin_graph(self, new_values, indices):
         color = self.get_yash_coin_line_color(new_values[0], new_values[-1])
-        update_simple_graph(None, new_values, xlim=(0, indices), color=color)
+        return update_simple_graph(None, new_values, xlim=(0, indices), color=color)
 
     def get_yash_coin_line_color(self, start, end):
         if start == end: return "gray"

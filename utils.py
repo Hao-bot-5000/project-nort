@@ -1,6 +1,7 @@
 from os.path    import join
 from os         import remove
 
+import io
 import json
 import math
 from matplotlib import pyplot as plt
@@ -125,40 +126,43 @@ def create_simple_graph(title, values=[], xlim=(), ylim=(),
         plt.fill_between(x=range(steps), y1=values, y2=[min(values)] * steps, 
                          facecolor=line.get_color(), alpha=0.2)
 
-    # TODO: save graph in memory rather than onto the hard drive
-    #       https://stackoverflow.com/questions/60006794/send-image-from-memory
-    #       https://stackoverflow.com/questions/8598673/how-to-save-a-pylab-figure-into-in-memory-file-which-can-be-read-into-pil-image
-    plt.savefig(fname="assets/plot", transparent=True)
+    buf = io.BytesIO()
+    plt.savefig(buf, transparent=True)
+    buf.seek(0)
+    return buf
 
 def update_simple_graph(title, values, xlim=(), ylim=(), gradient=True, **kwargs):
     steps = len(values)
 
     lines = plt.gca().get_lines()
     if not lines: # if graph is empty (no lines plotted), generate new graph
-        create_simple_graph(title, values, xlim=xlim, ylim=ylim, gradient=gradient, **kwargs)
-    else:
-        # update line by inputs
-        line = lines[0]
-        line_color = kwargs.get("color", None)
-        if line_color is not None and line.get_color() != line_color:
-            try: line.set_color(line_color)
-            except ValueError: pass
-        line.set_xdata(range(steps))
-        line.set_ydata(values)
+        return create_simple_graph(title, values, xlim=xlim, ylim=ylim, 
+                                   gradient=gradient, **kwargs)
 
-        # update area by inputs
-        # is it faster to remove and replace collections, or to update existing collections?
-        if gradient:
-            collections = plt.gca().collections
-            if collections:
-                plt.gca().collections.clear()
-            plt.fill_between(x=range(steps), y1=values, y2=[min(values)] * steps, 
-                             facecolor=line.get_color(), alpha=0.2)
+    # update line by inputs
+    line = lines[0]
+    line_color = kwargs.get("color", None)
+    if line_color is not None and line.get_color() != line_color:
+        try:
+            line.set_color(line_color)
+        except ValueError:
+            pass
+    line.set_xdata(range(steps))
+    line.set_ydata(values)
 
-        # TODO: save graph in memory rather than onto the hard drive
-        #       https://stackoverflow.com/questions/60006794/send-image-from-memory
-        #       https://stackoverflow.com/questions/8598673/how-to-save-a-pylab-figure-into-in-memory-file-which-can-be-read-into-pil-image
-        plt.savefig(fname="assets/plot", transparent=True)
+    # update area by inputs
+    # is it faster to remove and replace collections, or to update existing collections?
+    if gradient:
+        collections = plt.gca().collections
+        if collections:
+            plt.gca().collections.clear()
+        plt.fill_between(x=range(steps), y1=values, y2=[min(values)] * steps, 
+                         facecolor=line.get_color(), alpha=0.2)
+
+    buf = io.BytesIO()
+    plt.savefig(buf, transparent=True)
+    buf.seek(0)
+    return buf
 
 def get_simple_graph_num_points():
     count = 0
