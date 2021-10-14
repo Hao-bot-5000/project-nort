@@ -182,7 +182,7 @@ async def get_mentioned_member(message, backup):
     if not member:
         try:
             member = await guild.get_member(int(backup))
-        except Exception:
+        except ValueError:
             pass
 
     return member

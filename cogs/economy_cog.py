@@ -29,13 +29,14 @@ class EconomyCog(BaseCog):
         if len(args) > 0:
             raise TooManyArgumentsError("balance")
 
+        member_name = member
         member = (
             ctx.author if member is None else 
             await get_mentioned_member(ctx.message, backup=member)
         )
 
         if member is None:
-            raise MemberNotFoundError(member)
+            raise MemberNotFoundError(member_name)
 
         member_data = await self.get_member_data(ctx.guild, member)
         nort_bucks = dict_get_as_int(member_data, "nort_bucks")
