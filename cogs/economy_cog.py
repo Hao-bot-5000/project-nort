@@ -232,7 +232,7 @@ class EconomyCog(BaseCog):
         """
 
         if size <= 0:
-            return ValueError("'size' must be a positive value")
+            raise ValueError("'size' must be a positive value")
 
         now = datetime.now()
         return int(size * ((now.hour + (now.minute / 60)) / 24))
@@ -276,15 +276,15 @@ class EconomyCog(BaseCog):
         """
 
         if start <= 0:
-            return ValueError("'start' must be a positive value")
+            raise ValueError("'start' must be a positive value")
         if steps < 0:
-            return ValueError("'steps' must be a non-negative value")
+            raise ValueError("'steps' must be a non-negative value")
         if sigma < 0:
-            return ValueError("'sigma' must be a non-negative value")
+            raise ValueError("'sigma' must be a non-negative value")
         if lower >= upper:
-            return ValueError("'lower' must be smaller than 'upper'")
+            raise ValueError("'lower' must be smaller than 'upper'")
         if upper <= 0:
-            return ValueError("'lower' and 'upper' must both be positive values")
+            raise ValueError("'lower' and 'upper' must both be positive values")
 
         if mu < lower: mu = sigma
         elif mu > upper: mu = -sigma
