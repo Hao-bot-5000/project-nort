@@ -172,9 +172,9 @@ class EconomyCog(BaseCog):
         if len(args) > 0:
             raise TooManyArgumentsError("divest")
 
-        gain = -(await self.handle_investment(ctx, -self.input_to_positive_int(amount)))
-        if gain is not None:
-            await ctx.send(f"You received `{gain}` NortBucks from selling YashCoins!")
+        cost = await self.handle_investment(ctx, -self.input_to_positive_int(amount))
+        if cost is not None:
+            await ctx.send(f"You received `{-cost}` NortBucks from selling YashCoins!")
 
 
 
