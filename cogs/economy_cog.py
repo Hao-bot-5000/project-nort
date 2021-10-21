@@ -180,6 +180,27 @@ class EconomyCog(BaseCog):
 
     ### Helper Methods ###
     async def get_yash_coin_values(self, yash_coin_data=None):
+        """
+            Return a list of YashCoin values stored inside ``yash_coin_data``. If
+            ``yash_coin_data`` is not given, retrieve the YashCoin data from the
+            ``yash_coin.json`` file.
+
+            Parameters
+            ----------
+            yash_coin_data: :class:`dict`
+                the data on YashCoins.
+            
+            Returns
+            -------
+            yash_coin_values: :class:`list`
+                a list of the current YashCoin values.
+
+            Raises
+            ------
+            ValueError:
+                the YashCoin values could not be found inside ``yash_coin_data``.
+        """
+
         if yash_coin_data is None:
             yash_coin_data = await get_json_data(self.yash_coin_path)
 
@@ -188,38 +209,177 @@ class EconomyCog(BaseCog):
             raise ValueError("YashCoin values could not be properly retrieved")
 
         return yash_coin_values
-    
+
     def get_current_yash_coin_index(self, size):
+        """
+            Return the index that points to the most current value of YashCoin, relative
+            to the amount of time that has passed since the start of the current day.
+
+            Parameters
+            ----------
+            size: :class:`int`
+                the number of times the value of YashCoin changes per day.
+            
+            Returns
+            -------
+            index: :class:`int`
+                an index pointing to a value stored inside a list of YashCoin values.
+
+            Raises
+            ------
+            ValueError:
+                ``size`` is not a positive value.\n
+        """
+
+        if size <= 0:
+            return ValueError("'size' must be a positive value")
+
         now = datetime.now()
         return int(size * ((now.hour + (now.minute / 60)) / 24))
 
-    def create_yash_coin_values(self, initial=1000, steps=96, mu=0.05, sigma=0.2):
+    def create_yash_coin_values(self, start=1000, steps=96, mu=0, sigma=0.2,
+                                lower=500, upper=1500):
+        """
+            Return a list of YashCoin values which somewhat imitates stock prices over
+            time by using Geometric Brownian Motion
+
+            Parameters
+            ----------
+            start: :class:`int, optional`
+                the starting value that the list will start with.
+            steps: :class:`int, optional`
+                the number of times the value of YashCoin will fluctuate.
+            mu: :class:`float, optional`
+                the amount of drift from the starting value, or the rate of growth.
+            sigma: :class:`float, optional`
+                the amount of variation across the values.
+            lower: :class:`int, optional`
+                the minimum value before ``mu`` is overwritten to ``sigma`` to prevent
+                the value of YashCoin from continually decreasing even further.
+            upper: :class:`int, optional`
+                the maximum value before ``mu`` is overwritten to ``-sigma`` to prevent
+                the value of YashCoin from continually increasing even further.
+            
+            Returns
+            -------
+            yash_coin_values: :class:`list`
+                a calculated list of YashCoin values, with a length of ``1 + steps``.
+
+            Raises
+            ------
+            ValueError:
+                ``start`` is not a positive value.\n
+                ``steps`` is a negative value.\n
+                ``sigma`` is a negative value.\n
+                ``lower`` is greater than or equal to ``upper``.\n
+                ``lower`` or ``upper`` are not positive values.
+        """
+
+        if start <= 0:
+            return ValueError("'start' must be a positive value")
+        if steps < 0:
+            return ValueError("'steps' must be a non-negative value")
+        if sigma < 0:
+            return ValueError("'sigma' must be a non-negative value")
+        if lower >= upper:
+            return ValueError("'lower' must be smaller than 'upper'")
+        if upper <= 0:
+            return ValueError("'lower' and 'upper' must both be positive values")
+
+        if mu < lower: mu = sigma
+        elif mu > upper: mu = -sigma
+
         dy = 1 / steps
         dw = sqrt(dy) * random.randn(steps)
         increments = (mu - sigma * sigma / 2) * dy + sigma * dw
-        scales = self.create_yash_coin_scales(initial, steps)
-        values = [int(s * v) for s, v in zip(scales, cumprod(exp(increments)))]
-        return [initial] + values
-
-    def create_yash_coin_scales(self, initial, steps, min=500, max=1500):
-        if initial < max and initial > min:
-            return [initial] * steps
-
-        return linspace(initial, max if initial > max else min, steps).tolist()
+        values = [int(v) for v in start * cumprod(exp(increments))]
+        return [start] + values
 
     def create_yash_coin_graph(self, values, indices):
+        """
+            Return a buffer referencing the newly generated YashCoin stock graph.
+
+            Parameters
+            ----------
+            values: :class:`list[int]`
+                a list of YashCoin values.
+            indices: :class:`int`
+                the number of YashCoin values given.
+            
+            Returns
+            -------
+            buffer: :class:`io.BytesIO`
+                the buffer referencing the newly plotted graph.
+        """
+
         color = self.get_yash_coin_line_color(values[0], values[-1])
         return create_simple_graph(None, values, xlim=(0, indices), color=color)
-    
+
     def update_yash_coin_graph(self, new_values, indices):
+        """
+            Return a buffer referencing an updated YashCoin stock graph, based on the
+            values given.
+
+            Parameters
+            ----------
+            new_values: :class:`list[int]`
+                a list of YashCoin values to replace the previous values.
+            indices: :class:`int`
+                the number of YashCoin values given.
+            
+            Returns
+            -------
+            buffer: :class:`io.BytesIO`
+                the buffer referencing the updated graph.
+        """
+
         color = self.get_yash_coin_line_color(new_values[0], new_values[-1])
         return update_simple_graph(None, new_values, xlim=(0, indices), color=color)
 
     def get_yash_coin_line_color(self, start, end):
+        """
+            Return a color based on the difference between the two given values. If
+            there is no difference between the two values, the color will be gray. If
+            the first value is smaller than the second value, the color will be green.
+            If the first value is larger than the second value, the color will be red.
+
+            Parameters
+            ----------
+            start: :class:`int`
+                the initial value of YashCoin.
+            end: :class:`int`
+                the final value of YashCoin.
+            
+            Returns
+            -------
+            color: :class:`str`
+                the line color used for the YashCoin stock graph.
+        """
+
         if start == end: return "gray"
         return "green" if start < end else "red"
 
     async def handle_investment(self, ctx, amount):
+        """
+            Return the number of NortCoins lost from the transaction. If the transaction
+            results in an invalid currency value, such as a negative number, send a
+            message through the context indicating the transaction could not be made,
+            and return ``None``.
+
+            Parameters
+            ----------
+            ctx: :class:`discord.Context`
+                the current context for a command sent by a member.
+            amount: :class:`int`
+                the amount of YashCoins to add to a member's data.
+            
+            Returns
+            -------
+            value: :class:`int, None`
+                the amount of NortCoins lost after the transaction if the transaction
+                was successful, otherwise ``None``.
+        """
+
         yash_coin_values = await self.get_yash_coin_values()
         current_idx = self.get_current_yash_coin_index(len(yash_coin_values))
         current_value = yash_coin_values[current_idx]
