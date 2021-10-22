@@ -241,7 +241,7 @@ class EconomyCog(BaseCog):
                                 lower=500, upper=1500):
         """
             Return a list of YashCoin values which somewhat imitates stock prices over
-            time by using Geometric Brownian Motion
+            time by using Geometric Brownian Motion.
 
             Parameters
             ----------
@@ -254,11 +254,11 @@ class EconomyCog(BaseCog):
             sigma: :class:`float, optional`
                 the amount of variation across the values.
             lower: :class:`int, optional`
-                the minimum value before ``mu`` is overwritten to ``sigma`` to prevent
-                the value of YashCoin from continually decreasing even further.
+                the minimum value of ``start`` before ``mu`` is set to ``sigma`` to
+                slightly prevent the value of YashCoin from further decreasing.
             upper: :class:`int, optional`
-                the maximum value before ``mu`` is overwritten to ``-sigma`` to prevent
-                the value of YashCoin from continually increasing even further.
+                the maximum value of ``start`` before ``mu`` is set to ``-sigma`` to
+                slightly prevent the value of YashCoin from further increasing.
             
             Returns
             -------
@@ -286,8 +286,8 @@ class EconomyCog(BaseCog):
         if upper <= 0:
             raise ValueError("'lower' and 'upper' must both be positive values")
 
-        if mu < lower: mu = sigma
-        elif mu > upper: mu = -sigma
+        if start < lower: mu = sigma
+        elif start > upper: mu = -sigma
 
         dy = 1 / steps
         dw = sqrt(dy) * random.randn(steps)
