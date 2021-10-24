@@ -361,10 +361,11 @@ class EconomyCog(BaseCog):
 
     async def handle_investment(self, ctx, amount):
         """
-            Return the number of NortCoins lost from the transaction. If the transaction
-            results in an invalid currency value, such as a negative number, send a
-            message through the context indicating the transaction could not be made,
-            and return ``None``.
+            Handle the transaction of YashCoins based on the given amount and return the
+            number of NortBucks lost from the transaction. If the transaction results in
+            an invalid currency value, such as a negative number, send a message through
+            the context indicating the transaction could not be made, and return
+            ``None``.
 
             Parameters
             ----------
@@ -376,7 +377,7 @@ class EconomyCog(BaseCog):
             Returns
             -------
             value: :class:`int, None`
-                the amount of NortCoins lost after the transaction if the transaction
+                the amount of NortBucks lost after the transaction if the transaction
                 was successful, otherwise ``None``.
         """
 
