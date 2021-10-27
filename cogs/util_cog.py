@@ -90,7 +90,28 @@ class UtilCog(BaseCog):
 
 
     ### Helper Methods ###
-    def create_help_message(self, author, input):
+    def create_help_message(self, author, input=None):
+        """
+            Return a help message based on the given input.
+
+            Parameters
+            ----------
+            author: :class:`discord.Member`
+                a discord member that sent the help command.
+            input: :class:`str, optional`
+                the name of a command or cog.
+            
+            Returns
+            -------
+            reply: :class:`str`
+                a help message for the given discord member.
+
+            Raises
+            ------
+            ValueError:
+                a command or cog could not be found from ``input``.
+        """
+
         mention = f"{author.mention}\n"
 
         if input is None:
@@ -105,38 +126,56 @@ class UtilCog(BaseCog):
                 "for more information on a category"
             )
 
-        res = self.get_command_or_cog(input)
-
-        if isinstance(res, commands.Command):
+        command = self.bot.get_command(input)
+        if command is not None:
             return mention + (
-                f"\n`{self.bot.command_prefix}{res.name}" +
-                "".join(f" <{p}>" for p in list(res.clean_params.keys())[:-1]) +
-                f"`: {res.description}" +
+                f"\n`{self.bot.command_prefix}{command.name}" +
+                "".join(f" <{p}>" for p in list(command.clean_params.keys())[:-1]) +
+                f"`: {command.description}" +
 
-                (f"\n\nAliases: `{', '.join(a for a in res.aliases)}`"
-                 if len(res.aliases) > 0 else "")
+                (f"\n\nAliases: `{', '.join(a for a in command.aliases)}`"
+                 if len(command.aliases) > 0 else "")
             )
 
-        # if isinstance(res, commands.Cog)
-        return mention + (f"\n**{res.category}**:{self.cog_get_commands_as_str(res)}")
+        cog = self.bot.get_cog(input)
+        if cog is not None:
+            return mention + (f"\n**{cog.name}**:{self.cog_get_commands_as_str(cog)}")
 
-    def get_command_or_cog(self, name):
-        cmd = self.bot.get_command(name)
-
-        if cmd is not None:
-            return cmd
-
-        cog = next((c for c in self.bot.cogs.values() if c.category == name), None)
-        if cog is None:
-            raise ValueError(f"Could not find command or category called '{name}'")
-
-        return cog
+        raise ValueError(f"Could not find a command or cog called '{input}'")
 
     def cog_get_commands_as_str(self, cog):
+        """
+            Return a string that lists out all the commands of a given cog.
+
+            Parameters
+            ----------
+            cog: :class:`discord.Cog`
+                a cog that has been loaded onto the bot.
+
+            Returns
+            -------
+            commands: :class:`str`
+                a string representation of every command defined inside ``cog``.
+        """
+
         return "".join(f"\n\t`{self.bot.command_prefix}{command.name}`: {command.brief}"
                        for command in cog.get_commands())
 
     def create_sample_poll_message(self, sample_name):
+        """
+            Return a message that displays how the poll command works.
+
+            Parameters
+            ----------
+            sample_name: :class:`str`
+                an input to use as part of the sample message.
+
+            Returns
+            -------
+            sample_message: :class:`str`
+                an example message for the poll command.
+        """
+
         return (
             f"Please input a message to vote on — for example: " +
             f"`{self.bot.command_prefix}poll \"Is {sample_name} a real one?\" Yes No`"
@@ -149,7 +188,23 @@ class UtilCog(BaseCog):
                    get_emoji(":seven:"), get_emoji(":eight:"), get_emoji(":nine:"),
                    get_emoji(":ten:"))
 
-    def add_poll_options(self, embed, message, options, num_options):
+    def add_poll_options(self, embed, message, options=(), num_options=0):
+        """
+            Add to the embed the given poll message and options. If the number of options
+            given is ``0``, the default ``("Yes", "No")`` options will be added.
+
+            Parameters
+            ----------
+            embed: :class:`discord.Embed`
+                an embed to display the poll options on.
+            message: :class:`str`
+                a poll message.
+            options: :class:`tuple[str]`
+                the poll options.
+            num_options: :class:`int`
+                the number of poll options.
+        """
+
         if num_options == 0:
             options = ("Yes", "No")
             emojis = self.DEFAULT_EMOJIS
@@ -161,7 +216,19 @@ class UtilCog(BaseCog):
             value='\n'.join(f"{e} `{o}`" for e, o in zip(emojis, options))
         )
 
-    async def add_poll_reactions(self, message, num_options):
+    async def add_poll_reactions(self, message, num_options=0):
+        """
+            React to a message with the given amount of poll options. If the number of
+            options given is ``0``, the default thumbs up/down reactions will be used.
+
+            Parameters
+            ----------
+            message: :class:`discord.Message`
+                a discord message.
+            num_options: :class:`int`
+                the number of reactions to create.
+        """
+
         if num_options == 0:
             await self.add_reactions(message, *self.DEFAULT_EMOJIS)
             return
