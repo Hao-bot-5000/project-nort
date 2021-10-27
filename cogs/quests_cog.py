@@ -10,10 +10,10 @@ from utils              import (get_json_path, get_json_data, set_json_data,
 from cogs.base_cog      import BaseCog
 from custom_errors      import TooManyArgumentsError
 
-class QuestsCog(BaseCog):
+class QuestsCog(BaseCog, name="Quests"):
     def __init__(self, bot):
         self.quests_path = get_json_path("quests")
-        super().__init__(bot, category="Quests")
+        super().__init__(bot)
 
     ### Daily Claim Command ###
     @commands.command(

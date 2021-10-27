@@ -13,11 +13,11 @@ from utils              import (get_json_path, get_json_data, set_json_data,
 from cogs.base_cog      import BaseCog
 from custom_errors      import TooManyArgumentsError, MemberNotFoundError
 
-class EconomyCog(BaseCog):
+class EconomyCog(BaseCog, name="Economy"):
     def __init__(self, bot):
         self.graph_url = None
         self.yash_coin_path = get_json_path("yash_coin")
-        super().__init__(bot, category="Economy")
+        super().__init__(bot)
 
     ### Balance command ###
     @commands.command(

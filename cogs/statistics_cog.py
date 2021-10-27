@@ -7,9 +7,9 @@ from utils              import (get_mentioned_member, dict_get_as_float,
 from cogs.base_cog      import BaseCog
 from custom_errors      import TooManyArgumentsError, MemberNotFoundError
 
-class StatisticsCog(BaseCog):
+class StatisticsCog(BaseCog, name="Statistics"):
     def __init__(self, bot):
-        super().__init__(bot, category="Statistics")
+        super().__init__(bot)
 
     @commands.command(
         aliases=["cm"],

@@ -7,9 +7,9 @@ from random             import randint
 from utils              import get_emoji
 from custom_errors      import TooManyArgumentsError
 
-class UtilCog(BaseCog):
+class UtilCog(BaseCog, name="Utility"):
     def __init__(self, bot):
-        super().__init__(bot, category="Utility")
+        super().__init__(bot)
 
     ### Help Command ###
     @commands.command(
@@ -116,7 +116,7 @@ class UtilCog(BaseCog):
 
         if input is None:
             return mention + (
-                "\n".join(f"**{c.category}**: {self.cog_get_commands_as_str(c)}"
+                "\n".join(f"**{c.qualified_name}**: {self.cog_get_commands_as_str(c)}"
                           for c in self.bot.cogs.values()) +
 
                 f"\n\nRun `{self.bot.command_prefix}help <command>` " +
@@ -139,7 +139,9 @@ class UtilCog(BaseCog):
 
         cog = self.bot.get_cog(input)
         if cog is not None:
-            return mention + (f"\n**{cog.name}**:{self.cog_get_commands_as_str(cog)}")
+            return mention + (
+                f"\n**{cog.qualified_name}**:{self.cog_get_commands_as_str(cog)}"
+            )
 
         raise ValueError(f"Could not find a command or cog called '{input}'")
 

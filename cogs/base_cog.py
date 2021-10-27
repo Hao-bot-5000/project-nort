@@ -5,10 +5,8 @@ from utils          import get_json_path, get_json_data, set_json_data
 from custom_errors  import InvalidTypeError
 
 class BaseCog(commands.Cog):
-    def __init__(self, bot, category):
+    def __init__(self, bot):
         self.bot = bot
-        self.category = category
-
         self.data_path = get_json_path("data")
 
     async def get_data(self):
