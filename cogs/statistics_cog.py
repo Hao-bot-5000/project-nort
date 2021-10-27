@@ -7,9 +7,9 @@ from utils              import (get_mentioned_member, dict_get_as_float,
 from cogs.base_cog      import BaseCog
 from custom_errors      import TooManyArgumentsError, MemberNotFoundError
 
-class StatisticsCog(BaseCog):
+class StatisticsCog(BaseCog, name="Statistics"):
     def __init__(self, bot):
-        super().__init__(bot, category="Statistics")
+        super().__init__(bot)
 
     @commands.command(
         aliases=["cm"],
@@ -51,6 +51,28 @@ class StatisticsCog(BaseCog):
     CRINGE_STATUSES = ("Not Cringe", "Kinda Cringe", "Cringe", "Ultra Cringe", "YASH")
 
     def get_cringe_status(self, percent):
+        """
+            Return a status based on the given percentage value.
+
+            Parameters
+            ----------
+            percent: :class:`int`
+                an integer representation of a percentage value.
+
+            Returns
+            -------
+            status: :class:`str`
+                the calculated status.
+
+            Raises
+            ------
+            ValueError:
+                ``percent`` is not between ``0`` and ``100``.
+        """
+
+        if percent < 0 or percent > 100:
+            raise ValueError("'percent' must be between '0' and '100'")
+
         if percent == 69: return "Nice"
         return self.CRINGE_STATUSES[int(percent / 100 * (len(self.CRINGE_STATUSES) - 1))]
         
