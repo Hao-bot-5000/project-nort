@@ -6,9 +6,9 @@ from cogs.base_cog      import BaseCog
 from discord.errors     import ClientException
 from custom_errors      import TooManyArgumentsError
 
-class MusicCog(BaseCog):
+class MusicCog(BaseCog, name="Music"):
     def __init__(self, bot):
-        super().__init__(bot, category="Music")
+        super().__init__(bot)
 
     @commands.command(
         aliases=["p"],
