@@ -1,0 +1,66 @@
+{
+    "legendary": [
+        {
+            "name": "Yashtola",
+            "brief": null,
+            "image": null,
+            "hit_points": 100,
+            "attack_power": 175,
+            "speed": 125
+        },
+        {
+            "name": "Yashcred",
+            "brief": null,
+            "image": null,
+            "hit_points": 250,
+            "attack_power": 75,
+            "speed": 75
+        }
+    ],
+    "rare": [
+        {
+            "name": "Tridecagon",
+            "brief": "A 13-sided polygon",
+            "image": null,
+            "hit_points": 135,
+            "attack_power": 115,
+            "speed": 100
+        }
+    ],
+    "common": [
+        {
+            "name": "Triangle",
+            "brief": "A triangle",
+            "image": null,
+            "hit_points": 75,
+            "attack_power": 120,
+            "speed": 105
+        },
+        {
+            "name": "Pentagon",
+            "brief": "A pentagon",
+            "image": null,
+            "hit_points": 100,
+            "attack_power": 80,
+            "speed": 120
+        },
+        {
+            "name": "Octagon",
+            "brief": "An octagon",
+            "image": null,
+            "hit_points": 140,
+            "attack_power": 85,
+            "speed": 75
+        }
+    ],
+    "useless": [
+        {
+            "name": "Versadge",
+            "brief": null,
+            "image": null,
+            "hit_points": 70,
+            "attack_power": 80,
+            "speed": 100
+        }
+    ]
+}
