@@ -46,7 +46,7 @@ class QuestsCog(BaseCog, name="Quests"):
 
     ### Expedition Command ###
     @commands.command(
-        aliases=["exped"],
+        aliases=["exp"],
         brief="Go on expedition to find NortBucks",
         description="Start an expedition based on the given level "
                     "(short, normal, long)"
