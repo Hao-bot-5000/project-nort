@@ -7,7 +7,7 @@ from math               import sqrt
 
 from utils              import (get_json_path, get_json_data, set_json_data,
                                 get_emoji, create_simple_graph, update_simple_graph,
-                                get_simple_graph_num_points, get_mentioned_member, 
+                                get_simple_graph_length, get_mentioned_member, 
                                 dict_get_as_int, dict_get_as_list)
 
 from cogs.base_cog      import BaseCog
@@ -98,7 +98,7 @@ class EconomyCog(BaseCog, name="Economy"):
             self.yash_coin_data["prev_check"] = today
             self.yash_coin_data["values"] = new_values
 
-            set_json_data(self.yash_coin_path, self.yash_coin_data)
+            set_json_data(self.yash_coin_data_path, self.yash_coin_data)
 
             indices = len(new_values)
             current_values = new_values[:self.get_current_yash_coin_index(indices) + 1]
@@ -114,7 +114,7 @@ class EconomyCog(BaseCog, name="Economy"):
             indices = len(values)
             current_values = values[:self.get_current_yash_coin_index(indices) + 1]
 
-            if get_simple_graph_num_points() < len(current_values):
+            if get_simple_graph_length() < len(current_values) or self.graph_url is None:
                 buffer = self.update_yash_coin_graph(current_values, indices)
             else:
                 buffer = None
@@ -134,8 +134,8 @@ class EconomyCog(BaseCog, name="Economy"):
             value=f"`{now.strftime('%b %d, %I:%M %p')} PT`",
             inline=False
         )
-        
-        if not buffer:
+
+        if buffer is None:
             embed_reply.set_image(url=self.graph_url)
             await ctx.send(embed=embed_reply)
         else:
