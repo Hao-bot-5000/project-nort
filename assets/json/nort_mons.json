@@ -25,6 +25,14 @@
             "hit_points": 135,
             "attack_power": 115,
             "speed": 100
+        },
+        {
+            "name": "Cookie the Monster",
+            "brief": "No copyright strike please",
+            "image": null,
+            "hit_points": 110,
+            "attack_power": 65,
+            "speed": 175
         }
     ],
     "common": [
