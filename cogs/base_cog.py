@@ -5,23 +5,13 @@ from utils          import get_json_path, get_json_data, set_json_data
 from custom_errors  import InvalidTypeError
 
 class BaseCog(commands.Cog):
+    data_path = get_json_path("data")
+    data = get_json_data(data_path)
+
     def __init__(self, bot):
         self.bot = bot
-        self.data_path = get_json_path("data")
 
-    async def get_data(self):
-        """
-            Return the data stored inside the ``data.json`` file.
-
-            Returns
-            -------
-            json_data: :class:`dict`
-                the JSON object.
-        """
-
-        return await get_json_data(self.data_path)
-
-    async def get_guild_data(self, guild, data=None):
+    def get_guild_data(self, guild, data=None, default=False):
         """
             Return the guild data stored inside ``data``. If ``data`` is not given,
             retrieve the data from the ``data.json`` file.
@@ -32,6 +22,9 @@ class BaseCog(commands.Cog):
                 a discord guild.
             data: :class:`dict, optional`
                 the JSON object.
+            default: :class:`boolean, optional`
+                a truth value determining whether to insert a default value if the data
+                does not exist.
 
             Returns
             -------
@@ -45,15 +38,16 @@ class BaseCog(commands.Cog):
         """
 
         if data is None:
-            data = await self.get_data()
+            data = self.data
 
-        guild_data = data.setdefault(str(guild.id), {})
+        guild_id = str(guild.id)
+        guild_data = data.setdefault(guild_id, {}) if default else data.get(guild_id, {})
         if not isinstance(guild_data, dict):
             raise ValueError(f"Could not get guild data for '{guild.id}'")
 
         return guild_data
 
-    async def get_member_list_data(self, guild, guild_data=None):
+    def get_member_list_data(self, guild, guild_data=None, default=False):
         """
             Return a list of member data stored inside ``guild_data``. If ``guild_data``
             is not given, retrieve the guild data from the ``data.json`` file.
@@ -64,6 +58,9 @@ class BaseCog(commands.Cog):
                 a discord guild.
             guild_data: :class:`dict, optional`
                 a guild's data.
+            default: :class:`boolean, optional`
+                a truth value determining whether to insert a default value if the data
+                does not exist.
 
             Returns
             -------
@@ -77,15 +74,18 @@ class BaseCog(commands.Cog):
         """
 
         if guild_data is None:
-            guild_data = await self.get_guild_data(guild)
+            guild_data = self.get_guild_data(guild, default=default)
 
-        member_list_data = guild_data.setdefault("yc_members", {})
+        member_list_data = (
+            guild_data.setdefault("yc_members", {}) if default
+            else guild_data.get("yc_members", {})
+        )
         if not isinstance(member_list_data, dict):
             raise ValueError(f"Could not get members list for '{guild.id}'")
 
         return member_list_data
 
-    async def get_member_data(self, guild, member, member_list_data=None):
+    def get_member_data(self, guild, member, member_list_data=None, default=False):
         """
             Return the guild member data stored inside ``member_list_data``. If
             ``member_list_data`` is not given, retrieve the member list data from the
@@ -99,6 +99,9 @@ class BaseCog(commands.Cog):
                 a discord member that is part of the guild.
             member_list_data: :class:`dict, optional`
                 the data of members in the guild.
+            default: :class:`boolean, optional`
+                a truth value determining whether to insert a default value if the data
+                does not exist.
 
             Returns
             -------
@@ -112,15 +115,19 @@ class BaseCog(commands.Cog):
         """
 
         if member_list_data is None:
-            member_list_data = await self.get_member_list_data(guild)
+            member_list_data = self.get_member_list_data(guild, default=default)
 
-        member_data = member_list_data.setdefault(str(member.id), {})
+        member_id = str(member.id)
+        member_data = (
+            member_list_data.setdefault(member_id, {}) if default
+            else member_list_data.get(member_id, {})
+        )
         if not isinstance(member_data, dict):
             raise ValueError(f"Could not get member data for '{guild.id}-{member.id}'")
 
         return member_data
 
-    async def register_member(self, guild, member, member_list_data=None):
+    def register_member(self, guild, member, member_list_data=None):
         """
             Store the new guild member data into the ``data.json`` file. Return ``True``
             if the guild member was successfully registered, and ``False`` otherwise.
@@ -141,7 +148,7 @@ class BaseCog(commands.Cog):
         """
 
         if member_list_data is None:
-            member_list_data = await self.get_member_list_data(guild)
+            member_list_data = self.get_member_list_data(guild, default=True)
 
         is_new_member = not self.member_is_registered(guild, member, member_list_data)
         if is_new_member:
@@ -155,7 +162,7 @@ class BaseCog(commands.Cog):
 
         return is_new_member
 
-    async def member_is_registered(self, guild, member, member_list_data=None):
+    def member_is_registered(self, guild, member, member_list_data=None):
         """
             Return ``True`` if the guild member data exists in ``member_list_data``, and
             ``False`` otherwise. If ``member_list_data`` is not given, retrieve the
@@ -177,7 +184,7 @@ class BaseCog(commands.Cog):
         """
 
         if member_list_data is None:
-            member_list_data = await self.get_member_list_data(guild)
+            member_list_data = self.get_member_list_data(guild)
 
         return member_list_data.get(str(member.id)) is not None
 

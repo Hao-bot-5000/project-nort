@@ -82,7 +82,7 @@ def get_json_path(fname):
 # Retrieve json contents based on path URL
 # If file is not a valid JSON document, return an empty dictionary
 # If file cannot be opened, throws an error
-async def get_json_data(path):
+def get_json_data(path):
     try:
         json_file = open(path, "r")
         json_data = json.load(json_file)
@@ -94,7 +94,7 @@ async def get_json_data(path):
 
 # Modify json contents stored at path URL
 # If file cannot be opened, throws an error
-async def set_json_data(path, json_data):
+def set_json_data(path, json_data):
     json_file = open(path, "w")
     json.dump(json_data, json_file, indent=4)
     json_file.close()

@@ -30,7 +30,7 @@ class StatisticsCog(BaseCog, name="Statistics"):
         if member is None:
             raise MemberNotFoundError(member_name)
 
-        member_data = await self.get_member_data(ctx.guild, member)
+        member_data = self.get_member_data(ctx.guild, member)
         cringe_meter = dict_get_as_float(member_data, "cringe_meter")
         percent, bar = create_progress_bar(cringe_meter)
 
