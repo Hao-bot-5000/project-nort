@@ -164,7 +164,7 @@ def update_simple_graph(title, values, xlim=(), ylim=(), gradient=True, **kwargs
     buf.seek(0)
     return buf
 
-def get_simple_graph_num_points():
+def get_simple_graph_length():
     count = 0
     for line in plt.gca().get_lines():
         count += len(line.get_xdata())
