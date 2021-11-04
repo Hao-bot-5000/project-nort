@@ -2,7 +2,7 @@
     "legendary": [
         {
             "name": "Yashtola",
-            "brief": null,
+            "brief": "She may be blind, but oh boy is she strong",
             "image": null,
             "hit_points": 100,
             "attack_power": 175,
@@ -10,7 +10,7 @@
         },
         {
             "name": "Yashcred",
-            "brief": null,
+            "brief": "The tankiest of all the tanky boys",
             "image": null,
             "hit_points": 250,
             "attack_power": 75,
@@ -33,6 +33,14 @@
             "hit_points": 110,
             "attack_power": 65,
             "speed": 175
+        },
+        {
+            "name": "Captain Yahm",
+            "brief": "Conqueror of the seven seas",
+            "image": null,
+            "hit_points": 100,
+            "attack_power": 140,
+            "speed": 110
         }
     ],
     "common": [
@@ -59,16 +67,56 @@
             "hit_points": 140,
             "attack_power": 85,
             "speed": 75
+        },
+        {
+            "name": "Bing Chilling",
+            "brief": "Loves ice cream",
+            "image": null,
+            "hit_points": 105,
+            "attack_power": 105,
+            "speed": 90
         }
     ],
     "useless": [
         {
             "name": "Versadge",
-            "brief": null,
+            "brief": "Has the unique power of making everything around it depressed",
             "image": null,
             "hit_points": 70,
             "attack_power": 80,
             "speed": 100
+        },
+        {
+            "name": "Flaeme",
+            "brief": "An entity born from the flames of a raging fire, but lost all its powers from being misspelled",
+            "image": null,
+            "hit_points": 70,
+            "attack_power": 105,
+            "speed": 75
+        },
+        {
+            "name": "Master Y13",
+            "brief": "A self-proclaimed professional gamer",
+            "image": null,
+            "hit_points": 125,
+            "attack_power": 90,
+            "speed": 35
+        },
+        {
+            "name": "Lord Prime",
+            "brief": "Likes to join events for no reason and leave instantly",
+            "image": null,
+            "hit_points": 35,
+            "attack_power": 45,
+            "speed": 170
+        },
+        {
+            "name": "Emvipee",
+            "brief": "Has grubby little hands with no social nor fiscal responsibilities",
+            "image": null,
+            "hit_points": 60,
+            "attack_power": 110,
+            "speed": 80
         }
     ]
 }
