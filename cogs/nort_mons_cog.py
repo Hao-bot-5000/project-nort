@@ -99,6 +99,7 @@ class NortMonsCog(BaseCog, name="NortMons"):
 
         nort_mon_data = dict_get_as_list(self.nort_mons_data, rarity)[int(idx)]
         name = nort_mon_data.get("name")
+        brief = nort_mon_data.get("brief")
         hit_points = nort_mon_data.get("hit_points")
         attack_power = nort_mon_data.get("attack_power")
         speed = nort_mon_data.get("speed")
@@ -111,6 +112,11 @@ class NortMonsCog(BaseCog, name="NortMons"):
         )
         embed_reply.add_field(
             name=f"**{rarity.capitalize()} — {name}**",
+            value=f"{brief}",
+            inline=False
+        )
+        embed_reply.add_field(
+            name="\u200b",
             value=f"**HP**: `{hit_points}`\n"
                   f"**ATK**: `{attack_power}`\n"
                   f"**SPD**: `{speed}`",
