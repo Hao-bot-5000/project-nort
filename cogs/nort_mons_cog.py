@@ -2,8 +2,8 @@ import discord
 from discord.ext        import commands
 
 from random             import uniform, randint
-from utils              import (get_json_path, get_json_data, dict_get_as_list,
-                                get_mentioned_member)
+from utils              import (get_json_path, get_json_data, set_json_data,
+                                dict_get_as_list, get_mentioned_member)
 
 from cogs.base_cog      import BaseCog
 from custom_errors      import TooManyArgumentsError, MemberNotFoundError
@@ -24,8 +24,22 @@ class NortMonsCog(BaseCog, name="NortMons"):
         if len(args) > 0:
             raise TooManyArgumentsError("catch")
 
-        await ctx.send(self.get_random_nort_mon())
-        # TODO: attach NortMon id to member's data
+        member_data = self.get_member_data(ctx.guild, ctx.author, default=True)
+        member_nort_mon = member_data.get("nort_mon")
+
+        if member_nort_mon is not None:
+            await ctx.send("You already own a NortMon")
+            return
+        
+        nort_mon_name, nort_mon_id = self.get_random_nort_mon()
+        rarity, _ = nort_mon_id.split("-")
+
+        member_data["nort_mon"] = nort_mon_id
+        set_json_data(self.data_path, self.data)
+
+        await ctx.send(
+            f"You've caught **{nort_mon_name}** — a `{rarity.capitalize()}` NortMon!"
+        )
 
     @commands.command(
         brief="Release NortMon",
@@ -36,8 +50,22 @@ class NortMonsCog(BaseCog, name="NortMons"):
         if len(args) > 0:
             raise TooManyArgumentsError("release")
 
-        await ctx.send("hello :)")
-        # TODO: remove NortMon from member's data
+        member_data = self.get_member_data(ctx.guild, ctx.author)
+        member_nort_mon = member_data.get("nort_mon")
+
+        if member_nort_mon is None:
+            await ctx.send("You do not own a NortMon")
+            return
+
+        member_data["nort_mon"] = None
+        set_json_data(self.data_path, self.data)
+
+        rarity, idx = member_nort_mon.split("-")
+        nort_mon_name = dict_get_as_list(self.nort_mons_data, rarity)[int(idx)].get("name")
+
+        await ctx.send(
+            f"You've released your `{rarity.capitalize()}` **{nort_mon_name}**"
+        )
 
     @commands.command(
         brief="Display NortMon",
@@ -58,10 +86,17 @@ class NortMonsCog(BaseCog, name="NortMons"):
             raise MemberNotFoundError(member_name)
 
         member_data = self.get_member_data(ctx.guild, member)
-        nort_mon_id = member_data.get("nort_mon", "rare-1") # TODO: create dict_get_as_str method?
-        rarity, idx = nort_mon_id.split("-")
+        nort_mon_id = member_data.get("nort_mon") # TODO: create dict_get_as_str method?
 
-        # TODO: show member's NortMon if they currently have one
+        if nort_mon_id is None:
+            await ctx.send(
+                "You do not own a NortMon" if member is ctx.author else
+                f"{member.display_name} does not own a NortMon"
+            )
+            return
+
+        rarity, idx = nort_mon_id.split("-") # TODO: handle potentially invalid strings (search for all str.split calls)
+
         nort_mon_data = dict_get_as_list(self.nort_mons_data, rarity)[int(idx)]
         name = nort_mon_data.get("name")
         hit_points = nort_mon_data.get("hit_points")
@@ -97,7 +132,9 @@ class NortMonsCog(BaseCog, name="NortMons"):
             if rand_weight <= weight:
                 nort_mons_by_rarity = dict_get_as_list(self.nort_mons_data, rarity)
                 rand_idx = randint(0, len(nort_mons_by_rarity) - 1)
-                return f"{rarity}-{rand_idx}"
+                nort_mon_name = nort_mons_by_rarity[rand_idx].get("name")
+                # Returns: tuple (str, str)
+                return (nort_mon_name, f"{rarity}-{rand_idx}")
 
 
 def setup(bot):
