@@ -3,7 +3,7 @@ from discord.ext        import commands
 
 from random             import uniform, randint
 from utils              import (get_json_path, get_json_data, set_json_data,
-                                dict_get_as_list, get_mentioned_member)
+                                dict_get_as_int, dict_get_as_list, get_mentioned_member)
 
 from cogs.base_cog      import BaseCog
 from custom_errors      import TooManyArgumentsError, MemberNotFoundError
@@ -12,12 +12,15 @@ class NortMonsCog(BaseCog, name="NortMons"):
     nort_mons_data_path = get_json_path("nort_mons")
     nort_mons_data = get_json_data(nort_mons_data_path)
 
+    NORT_MON_COST = 400
+
     def __init__(self, bot):
         super().__init__(bot)
 
     @commands.command(
         brief="Catch NortMon",
-        description="Catch yourself a Nortmon of a random rarity from the wild"
+        description="Use your NortBucks to catch yourself a Nortmon of a random rarity "
+                    "from the wild"
     )
     @commands.guild_only()
     async def catch(self, ctx, *args):
@@ -30,15 +33,26 @@ class NortMonsCog(BaseCog, name="NortMons"):
         if member_nort_mon is not None:
             await ctx.send("You already own a NortMon")
             return
-        
+
+        nort_bucks = dict_get_as_int(member_data, "nort_bucks")
+
+        if nort_bucks < self.NORT_MON_COST:
+            await ctx.send(
+                f"You do not have the required `{self.NORT_MON_COST}` NortBucks to " +
+                "spend on catching a NortMon"
+            )
+            return
+
         nort_mon_name, nort_mon_id = self.get_random_nort_mon()
         rarity, _ = nort_mon_id.split("-")
 
         member_data["nort_mon"] = nort_mon_id
+        member_data["nort_bucks"] = nort_bucks - self.NORT_MON_COST
         set_json_data(self.data_path, self.data)
 
         await ctx.send(
-            f"You've caught **{nort_mon_name}** — a `{rarity.capitalize()}` NortMon!"
+            f"You've spent `{self.NORT_MON_COST}` NortBucks to catch " +
+            f"**{nort_mon_name}** — a `{rarity.capitalize()}` NortMon!"
         )
 
     @commands.command(
