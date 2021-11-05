@@ -243,6 +243,6 @@ class BaseCog(commands.Cog):
         """
         value = int(input) if input is not None else default
         # NOTE: Do I really need to raise a custom error, or can I just raise ValueError?
-        if value < 1: raise InvalidTypeError("positive integer")
+        if value < 1: raise InvalidTypeError("positive number")
 
         return value
