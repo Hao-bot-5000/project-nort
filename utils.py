@@ -12,8 +12,8 @@ import discord
 import settings
 
 # Returns a path relative to the bot directory
-def get_rel_path(rel_path):
-    return join(settings.BASE_DIR, rel_path)
+def get_rel_path(*rel_path):
+    return join(settings.BASE_DIR, *rel_path)
 
 
 # Returns an emoji as required to send it in a message
@@ -77,7 +77,7 @@ async def try_upload_file(bot, channel, file_path, content=None,
 
 ### JSON Helpers ###
 def get_json_path(fname):
-    return f"./assets/json/{fname}.json"
+    return get_rel_path("assets", "json", f"{fname}.json")
 
 # Retrieve json contents based on path URL
 # If file is not a valid JSON document, return an empty dictionary
