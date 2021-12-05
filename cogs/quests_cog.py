@@ -10,10 +10,10 @@ from utils              import (get_json_path, get_json_data, set_json_data,
 from cogs.base_cog      import BaseCog
 from custom_errors      import TooManyArgumentsError
 
-class QuestsCog(BaseCog):
+class QuestsCog(BaseCog, name="Quests"):
     def __init__(self, bot):
         self.quests_path = get_json_path("quests")
-        super().__init__(bot, category="Quests")
+        super().__init__(bot)
 
     ### Daily Claim Command ###
     @commands.command(
@@ -72,9 +72,41 @@ class QuestsCog(BaseCog):
 
     ### Helper Methods ###
     async def get_quest_list_data(self):
+        """
+            Return the data stored inside the ``quests.json`` file.
+
+            Returns
+            -------
+            quest_list_data: :class:`dict`
+                the data of every quest stored inside the JSON file.
+        """
+
         return await get_json_data(self.quests_path)
 
     async def get_quest_data(self, quest_name, quest_list_data=None):
+        """
+            Return the quest data stored inside ``quest_list_data``. If
+            ``quest_list_data`` is not given, retrieve the quest list data from the
+            ``quests.json`` file.
+
+            Parameters
+            ----------
+            quest_name: :class:`str`
+                the name of a quest.
+            member_list_data: :class:`dict, optional`
+                the data of every quest stored inside the JSON file.
+
+            Returns
+            -------
+            quest_data: :class:`dict`
+                a quest's data.
+            
+            Raises
+            ------
+            ValueError:
+                the quest's data could not be found inside ``quest_list_data``.
+        """
+
         if quest_list_data is None:
             quest_list_data = await self.get_quest_list_data()
 
@@ -85,6 +117,25 @@ class QuestsCog(BaseCog):
         return quest_data
 
     async def start_expedition(self, ctx, member_data, data, level):
+        """
+            Start an expedition that lasts for a set duration based on the given level.
+            If the expedition is successful, add to the member's balance a set amount
+            of NortBucks and send a message through the context indicating that the
+            expedition has completed. If any invalid inputs were given or the expedition
+            data could not be retrieved, send an error message through the context.
+
+            Parameters
+            ----------
+            ctx: :class:`discord.Context`
+                the current context for a command sent by a member.
+            member_data: :class:`dict`
+                a member's data.
+            data: :class:`dict`
+                the data JSON object.
+            level: :class:`str`
+                the expedition's difficulty level.
+        """
+
         quest_data = await self.get_quest_data("expedition")
         num = dict_get_as_int(quest_data, "num_variations", 0)
         difficulties = dict_get_as_list(quest_data, "difficulty")
