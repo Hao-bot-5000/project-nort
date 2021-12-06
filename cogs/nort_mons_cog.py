@@ -90,22 +90,18 @@ class NortMonsCog(BaseCog, name="NortMons"):
         if len(args) > 0:
             raise TooManyArgumentsError("nortmon")
 
-        member_name = member
-        member = (
+        target_member = (
             ctx.author if member is None else 
-            await get_mentioned_member(ctx.message, backup=member)
+            get_mentioned_member(ctx.message, backup=member)
         )
 
-        if member is None:
-            raise MemberNotFoundError(member_name)
-
-        member_data = self.get_member_data(ctx.guild, member)
+        member_data = self.get_member_data(ctx.guild, target_member)
         nort_mon_id = member_data.get("nort_mon") # TODO: create dict_get_as_str method?
 
         if nort_mon_id is None:
             await ctx.send(
-                "You do not own a NortMon" if member is ctx.author else
-                f"{member.display_name} does not own a NortMon"
+                "You do not own a NortMon" if target_member is ctx.author else
+                f"{target_member.display_name} does not own a NortMon"
             )
             return
 
@@ -121,8 +117,8 @@ class NortMonsCog(BaseCog, name="NortMons"):
 
         embed_reply = self.create_embed()
         embed_reply.set_author(
-            name=f"{member.display_name}'s NortMon:",
-            icon_url=member.avatar_url
+            name=f"{target_member.display_name}'s NortMon:",
+            icon_url=target_member.avatar_url
         )
         embed_reply.add_field(
             name=f"**{rarity.capitalize()} — {name}**",

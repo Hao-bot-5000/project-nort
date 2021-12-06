@@ -21,23 +21,20 @@ class StatisticsCog(BaseCog, name="Statistics"):
         if len(args) > 0:
             raise TooManyArgumentsError("cringemeter")
 
-        member_name = member
-        member = (
+        target_member = (
             ctx.author if member is None else 
-            await get_mentioned_member(ctx.message, backup=member)
+            get_mentioned_member(ctx.message, backup=member)
         )
+        print(target_member)
 
-        if member is None:
-            raise MemberNotFoundError(member_name)
-
-        member_data = self.get_member_data(ctx.guild, member)
+        member_data = self.get_member_data(ctx.guild, target_member)
         cringe_meter = dict_get_as_float(member_data, "cringe_meter")
         percent, bar = create_progress_bar(cringe_meter)
 
         embed_reply = self.create_embed()
         embed_reply.set_author(
-            name=f"{member.display_name}'s Cringe Meter:",
-            icon_url=member.avatar_url
+            name=f"{target_member.display_name}'s Cringe Meter:",
+            icon_url=target_member.avatar_url
         )
         embed_reply.description = (
             f"**Status** `{self.get_cringe_status(percent)}`\n**{percent}%** `{bar}`"

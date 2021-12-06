@@ -32,16 +32,12 @@ class EconomyCog(BaseCog, name="Economy"):
         if len(args) > 0:
             raise TooManyArgumentsError("balance")
 
-        member_name = member
-        member = (
+        target_member = (
             ctx.author if member is None else 
-            await get_mentioned_member(ctx.message, backup=member)
+            get_mentioned_member(ctx.message, backup=member)
         )
 
-        if member is None:
-            raise MemberNotFoundError(member_name)
-
-        member_data = self.get_member_data(ctx.guild, member)
+        member_data = self.get_member_data(ctx.guild, target_member)
         nort_bucks = dict_get_as_int(member_data, "nort_bucks")
         yash_coins = dict_get_as_int(member_data, "yash_coins")
 
@@ -51,8 +47,8 @@ class EconomyCog(BaseCog, name="Economy"):
         
         embed_reply = self.create_embed()
         embed_reply.set_author(
-            name=f"{member.display_name}'s Balance:",
-            icon_url=member.avatar_url
+            name=f"{target_member.display_name}'s Balance:",
+            icon_url=target_member.avatar_url
         )
         embed_reply.add_field(
             name=f"**YashCoins** {get_emoji(':coin:')}",
