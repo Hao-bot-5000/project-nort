@@ -140,7 +140,7 @@ class NortMonsCog(BaseCog, name="NortMons"):
 
 
     # Helper Methods #
-    NORT_MON_WEIGHTS = { "legendary": 0.01, "rare": 0.04, "common": 0.2, "useless": 0.8 }
+    NORT_MON_WEIGHTS = { "legendary": 0.02, "rare": 0.08, "common": 0.5, "useless": 1 }
 
     def get_random_nort_mon(self):
         """
