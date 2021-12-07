@@ -75,7 +75,8 @@ class NortMonsCog(BaseCog, name="NortMons"):
         set_json_data(self.data_path, self.data)
 
         rarity, idx = member_nort_mon.split("-")
-        nort_mon_name = dict_get_as_list(self.nort_mons_data, rarity)[int(idx)].get("name")
+        nort_mon_data = dict_get_as_list(self.nort_mons_data, rarity)[int(idx)]
+        nort_mon_name = nort_mon_data.get("name")
 
         await ctx.send(
             f"You've released your `{rarity.capitalize()}` **{nort_mon_name}**"
@@ -142,6 +143,14 @@ class NortMonsCog(BaseCog, name="NortMons"):
     NORT_MON_WEIGHTS = { "legendary": 0.01, "rare": 0.04, "common": 0.2, "useless": 0.8 }
 
     def get_random_nort_mon(self):
+        """
+            Return a randomly selected NortMon.
+
+            Returns
+            -------
+            nort_mon: :class:`tuple(str, str)`
+                a tuple of size 2 containing the NortMon's name and id.
+        """
         rand_weight = uniform(0, next(reversed(self.NORT_MON_WEIGHTS.values())))
 
         for rarity, weight in self.NORT_MON_WEIGHTS.items():
