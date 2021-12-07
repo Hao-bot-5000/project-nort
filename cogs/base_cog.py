@@ -7,6 +7,7 @@ from custom_errors  import InvalidTypeError
 class BaseCog(commands.Cog):
     data_path = get_json_path("data")
     data = get_json_data(data_path)
+    img_404_url = "https://i.imgur.com/OMFiBp5.png"
 
     def __init__(self, bot):
         self.bot = bot

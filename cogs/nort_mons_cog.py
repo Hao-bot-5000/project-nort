@@ -113,7 +113,7 @@ class NortMonsCog(BaseCog, name="NortMons"):
         hit_points = nort_mon_data.get("hit_points")
         attack_power = nort_mon_data.get("attack_power")
         speed = nort_mon_data.get("speed")
-        image_url = nort_mon_data.get("image") or self.bot.user.avatar_url
+        image_url = nort_mon_data.get("image") or self.img_404_url
 
         embed_reply = self.create_embed()
         embed_reply.set_author(
