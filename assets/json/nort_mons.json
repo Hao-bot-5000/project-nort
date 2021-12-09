@@ -21,7 +21,7 @@
         {
             "name": "Tridecagon",
             "brief": "A 13-sided polygon",
-            "image": null,
+            "image": "https://i.imgur.com/I8HCWG1.png",
             "hit_points": 135,
             "attack_power": 115,
             "speed": 100
@@ -29,7 +29,7 @@
         {
             "name": "Cookie the Monster",
             "brief": "No copyright strike please",
-            "image": null,
+            "image": "https://i.imgur.com/h4l2k7x.png",
             "hit_points": 110,
             "attack_power": 65,
             "speed": 175
@@ -37,7 +37,7 @@
         {
             "name": "Captain Yahm",
             "brief": "Conqueror of the seven seas",
-            "image": null,
+            "image": "https://i.imgur.com/l1NgOvh.png",
             "hit_points": 100,
             "attack_power": 140,
             "speed": 110
