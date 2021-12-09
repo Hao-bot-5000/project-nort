@@ -3,7 +3,7 @@
         {
             "name": "Yashtola",
             "brief": "She may be blind, but oh boy is she strong",
-            "image": null,
+            "image": "https://i.imgur.com/sWKuX33.png",
             "hit_points": 100,
             "attack_power": 175,
             "speed": 125
@@ -11,7 +11,7 @@
         {
             "name": "Yashcred",
             "brief": "The tankiest of all the tanky boys",
-            "image": null,
+            "image": "https://i.imgur.com/GbwGZPr.png",
             "hit_points": 250,
             "attack_power": 75,
             "speed": 75
