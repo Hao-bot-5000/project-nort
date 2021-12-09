@@ -7,16 +7,18 @@ from math               import sqrt
 
 from utils              import (get_json_path, get_json_data, set_json_data,
                                 get_emoji, create_simple_graph, update_simple_graph,
-                                get_simple_graph_num_points, get_mentioned_member, 
+                                get_simple_graph_length, get_mentioned_member, 
                                 dict_get_as_int, dict_get_as_list)
 
 from cogs.base_cog      import BaseCog
 from custom_errors      import TooManyArgumentsError, MemberNotFoundError
 
 class EconomyCog(BaseCog, name="Economy"):
+    yash_coin_data_path = get_json_path("yash_coin")
+    yash_coin_data = get_json_data(yash_coin_data_path)
+
     def __init__(self, bot):
         self.graph_url = None
-        self.yash_coin_path = get_json_path("yash_coin")
         super().__init__(bot)
 
     ### Balance command ###
@@ -30,27 +32,23 @@ class EconomyCog(BaseCog, name="Economy"):
         if len(args) > 0:
             raise TooManyArgumentsError("balance")
 
-        member_name = member
-        member = (
+        target_member = (
             ctx.author if member is None else 
-            await get_mentioned_member(ctx.message, backup=member)
+            get_mentioned_member(ctx.message, backup=member)
         )
 
-        if member is None:
-            raise MemberNotFoundError(member_name)
-
-        member_data = await self.get_member_data(ctx.guild, member)
+        member_data = self.get_member_data(ctx.guild, target_member)
         nort_bucks = dict_get_as_int(member_data, "nort_bucks")
         yash_coins = dict_get_as_int(member_data, "yash_coins")
 
-        yash_coin_values = await self.get_yash_coin_values()
+        yash_coin_values = self.get_yash_coin_values(self.yash_coin_data)
         current_idx = self.get_current_yash_coin_index(len(yash_coin_values))
         current_value = yash_coin_values[current_idx]
         
         embed_reply = self.create_embed()
         embed_reply.set_author(
-            name=f"{member.display_name}'s Balance:",
-            icon_url=member.avatar_url
+            name=f"{target_member.display_name}'s Balance:",
+            icon_url=target_member.avatar_url
         )
         embed_reply.add_field(
             name=f"**YashCoins** {get_emoji(':coin:')}",
@@ -82,23 +80,21 @@ class EconomyCog(BaseCog, name="Economy"):
         if len(args) > 0:
             raise TooManyArgumentsError("stocks")
 
-        yash_coin_data = await get_json_data(self.yash_coin_path)
-
         now = datetime.now()
         today = str(date.today())
 
-        if yash_coin_data.get("prev_check", None) != today:
+        if self.yash_coin_data.get("prev_check", None) != today:
             # Generate new graph for new day
             try:
-                old_values = await self.get_yash_coin_values(yash_coin_data)
+                old_values = self.get_yash_coin_values(self.yash_coin_data)
                 new_values = self.create_yash_coin_values(old_values[-1])
             except ValueError:
                 new_values = self.create_yash_coin_values()
 
-            yash_coin_data["prev_check"] = today
-            yash_coin_data["values"] = new_values
+            self.yash_coin_data["prev_check"] = today
+            self.yash_coin_data["values"] = new_values
 
-            await set_json_data(self.yash_coin_path, yash_coin_data)
+            set_json_data(self.yash_coin_data_path, self.yash_coin_data)
 
             indices = len(new_values)
             current_values = new_values[:self.get_current_yash_coin_index(indices) + 1]
@@ -107,14 +103,14 @@ class EconomyCog(BaseCog, name="Economy"):
         else:
             # Update graph values
             try:
-                values = await self.get_yash_coin_values(yash_coin_data)
+                values = self.get_yash_coin_values(self.yash_coin_data)
             except ValueError:
                 values = self.create_yash_coin_values()
 
             indices = len(values)
             current_values = values[:self.get_current_yash_coin_index(indices) + 1]
 
-            if get_simple_graph_num_points() < len(current_values):
+            if get_simple_graph_length() < len(current_values) or self.graph_url is None:
                 buffer = self.update_yash_coin_graph(current_values, indices)
             else:
                 buffer = None
@@ -134,8 +130,8 @@ class EconomyCog(BaseCog, name="Economy"):
             value=f"`{now.strftime('%b %d, %I:%M %p')} PT`",
             inline=False
         )
-        
-        if not buffer:
+
+        if buffer is None:
             embed_reply.set_image(url=self.graph_url)
             await ctx.send(embed=embed_reply)
         else:
@@ -179,7 +175,7 @@ class EconomyCog(BaseCog, name="Economy"):
 
 
     ### Helper Methods ###
-    async def get_yash_coin_values(self, yash_coin_data=None):
+    def get_yash_coin_values(self, yash_coin_data=None):
         """
             Return a list of YashCoin values stored inside ``yash_coin_data``. If
             ``yash_coin_data`` is not given, retrieve the YashCoin data from the
@@ -202,7 +198,7 @@ class EconomyCog(BaseCog, name="Economy"):
         """
 
         if yash_coin_data is None:
-            yash_coin_data = await get_json_data(self.yash_coin_path)
+            yash_coin_data = self.yash_coin_data
 
         yash_coin_values = dict_get_as_list(yash_coin_data, "values")
         if not yash_coin_values:
@@ -381,14 +377,11 @@ class EconomyCog(BaseCog, name="Economy"):
                 was successful, otherwise ``None``.
         """
 
-        yash_coin_values = await self.get_yash_coin_values()
+        yash_coin_values = self.get_yash_coin_values(self.yash_coin_data)
         current_idx = self.get_current_yash_coin_index(len(yash_coin_values))
         current_value = yash_coin_values[current_idx]
 
-        data = await self.get_data()
-        guild_data = await self.get_guild_data(ctx.guild, data)
-        member_list_data = await self.get_member_list_data(ctx.guild, guild_data)
-        member_data = await self.get_member_data(ctx.guild, ctx.author, member_list_data)
+        member_data = self.get_member_data(ctx.guild, ctx.author, default=True)
 
         nort_bucks = dict_get_as_int(member_data, "nort_bucks", 0)
         yash_coins = dict_get_as_int(member_data, "yash_coins", 0)
@@ -412,7 +405,7 @@ class EconomyCog(BaseCog, name="Economy"):
         member_data["nort_bucks"] = nort_bucks - value
         member_data["yash_coins"] = yash_coins + amount
 
-        await set_json_data(self.data_path, data)
+        set_json_data(self.data_path, self.data)
         return value
 
 

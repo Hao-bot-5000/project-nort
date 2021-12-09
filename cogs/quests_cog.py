@@ -11,8 +11,10 @@ from cogs.base_cog      import BaseCog
 from custom_errors      import TooManyArgumentsError
 
 class QuestsCog(BaseCog, name="Quests"):
+    quests_data_path = get_json_path("quests")
+    quests_data = get_json_data(quests_data_path)
+
     def __init__(self, bot):
-        self.quests_path = get_json_path("quests")
         super().__init__(bot)
 
     ### Daily Claim Command ###
@@ -25,10 +27,7 @@ class QuestsCog(BaseCog, name="Quests"):
         if len(args) > 0:
             raise TooManyArgumentsError("daily")
 
-        data = await self.get_data()
-        guild_data = await self.get_guild_data(ctx.guild, data)
-        member_list_data = await self.get_member_list_data(ctx.guild, guild_data)
-        member_data = await self.get_member_data(ctx.guild, ctx.author, member_list_data)
+        member_data = self.get_member_data(ctx.guild, ctx.author, default=True)
 
         nort_bucks = dict_get_as_int(member_data, "nort_bucks", 0)
         prev_daily = member_data.get("prev_daily") # TODO: create dict_get_as_str method?
@@ -42,11 +41,11 @@ class QuestsCog(BaseCog, name="Quests"):
         else:
             await ctx.send("Daily NortBucks already claimed!")
 
-        await set_json_data(self.data_path, data)
+        set_json_data(self.data_path, self.data)
 
     ### Expedition Command ###
     @commands.command(
-        aliases=["exped"],
+        aliases=["exp"],
         brief="Go on expedition to find NortBucks",
         description="Start an expedition based on the given level "
                     "(short, normal, long)"
@@ -58,32 +57,18 @@ class QuestsCog(BaseCog, name="Quests"):
             raise TooManyArgumentsError("expedition")
 
         # Retrieve json contents
-        data = await self.get_data()
-        guild_data = await self.get_guild_data(ctx.guild, data)
-        member_list_data = await self.get_member_list_data(ctx.guild, guild_data)
-        member_data = await self.get_member_data(ctx.guild, ctx.author, member_list_data)
+
+        member_data = self.get_member_data(ctx.guild, ctx.author, default=True)
 
         if member_data.get("on_expedition") == 0:
-            await self.start_expedition(ctx, member_data, data, level)
+            await self.start_expedition(ctx, member_data, level)
         else:
             await ctx.send("Currently on expedition!")
 
 
 
     ### Helper Methods ###
-    async def get_quest_list_data(self):
-        """
-            Return the data stored inside the ``quests.json`` file.
-
-            Returns
-            -------
-            quest_list_data: :class:`dict`
-                the data of every quest stored inside the JSON file.
-        """
-
-        return await get_json_data(self.quests_path)
-
-    async def get_quest_data(self, quest_name, quest_list_data=None):
+    def get_quest_data(self, quest_name, quest_list_data=None):
         """
             Return the quest data stored inside ``quest_list_data``. If
             ``quest_list_data`` is not given, retrieve the quest list data from the
@@ -108,15 +93,15 @@ class QuestsCog(BaseCog, name="Quests"):
         """
 
         if quest_list_data is None:
-            quest_list_data = await self.get_quest_list_data()
+            quest_list_data = self.quests_data
 
-        quest_data = quest_list_data.setdefault(quest_name)
+        quest_data = quest_list_data.get(quest_name)
         if not isinstance(quest_data, dict):
             raise ValueError(f"Could not get quest data for '{quest_name}'")
 
         return quest_data
 
-    async def start_expedition(self, ctx, member_data, data, level):
+    async def start_expedition(self, ctx, member_data, level):
         """
             Start an expedition that lasts for a set duration based on the given level.
             If the expedition is successful, add to the member's balance a set amount
@@ -130,13 +115,11 @@ class QuestsCog(BaseCog, name="Quests"):
                 the current context for a command sent by a member.
             member_data: :class:`dict`
                 a member's data.
-            data: :class:`dict`
-                the data JSON object.
             level: :class:`str`
                 the expedition's difficulty level.
         """
 
-        quest_data = await self.get_quest_data("expedition")
+        quest_data = self.get_quest_data("expedition")
         num = dict_get_as_int(quest_data, "num_variations", 0)
         difficulties = dict_get_as_list(quest_data, "difficulty")
         durations = dict_get_as_list(quest_data, "duration")
@@ -153,7 +136,7 @@ class QuestsCog(BaseCog, name="Quests"):
             return
 
         member_data["on_expedition"] = 1
-        await set_json_data(self.data_path, data)
+        set_json_data(self.data_path, self.data)
         await ctx.send("Expedition started!")
 
         idx = difficulties.index(level)
@@ -164,7 +147,7 @@ class QuestsCog(BaseCog, name="Quests"):
         member_data["nort_bucks"] = nort_bucks + gain
         member_data["on_expedition"] = 0
 
-        await set_json_data(self.data_path, data)
+        set_json_data(self.data_path, self.data)
         await ctx.send(
             f"{ctx.author.mention}\nYour expedition has completed, " +
             f"netting you `{gain}` NortBucks!"

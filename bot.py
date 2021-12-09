@@ -96,14 +96,14 @@ def main():
 
     async def handle_guilds(guild, is_joining):
         path = get_json_path("data")
-        json_data = await get_json_data(path)
+        json_data = get_json_data(path)
 
         if is_joining:
             json_data[guild.id] = {}
         else:
             json_data.pop(guild.id, None)
 
-        await set_json_data(path, json_data)
+        set_json_data(path, json_data)
 
     @bot.event
     async def on_guild_join(guild):

@@ -1,0 +1,122 @@
+{
+    "legendary": [
+        {
+            "name": "Yashtola",
+            "brief": "She may be blind, but oh boy is she strong",
+            "image": null,
+            "hit_points": 100,
+            "attack_power": 175,
+            "speed": 125
+        },
+        {
+            "name": "Yashcred",
+            "brief": "The tankiest of all the tanky boys",
+            "image": null,
+            "hit_points": 250,
+            "attack_power": 75,
+            "speed": 75
+        }
+    ],
+    "rare": [
+        {
+            "name": "Tridecagon",
+            "brief": "A 13-sided polygon",
+            "image": null,
+            "hit_points": 135,
+            "attack_power": 115,
+            "speed": 100
+        },
+        {
+            "name": "Cookie the Monster",
+            "brief": "No copyright strike please",
+            "image": null,
+            "hit_points": 110,
+            "attack_power": 65,
+            "speed": 175
+        },
+        {
+            "name": "Captain Yahm",
+            "brief": "Conqueror of the seven seas",
+            "image": null,
+            "hit_points": 100,
+            "attack_power": 140,
+            "speed": 110
+        }
+    ],
+    "common": [
+        {
+            "name": "Triangle",
+            "brief": "A triangle",
+            "image": "https://i.imgur.com/IlAYeUP.png",
+            "hit_points": 75,
+            "attack_power": 120,
+            "speed": 105
+        },
+        {
+            "name": "Pentagon",
+            "brief": "A pentagon",
+            "image": "https://i.imgur.com/rIhbYAW.png",
+            "hit_points": 100,
+            "attack_power": 80,
+            "speed": 120
+        },
+        {
+            "name": "Octagon",
+            "brief": "An octagon",
+            "image": "https://i.imgur.com/yyBXwLm.png",
+            "hit_points": 140,
+            "attack_power": 85,
+            "speed": 75
+        },
+        {
+            "name": "Bing Chilling",
+            "brief": "Loves ice cream",
+            "image": "https://i.imgur.com/aZIFwXx.png",
+            "hit_points": 105,
+            "attack_power": 105,
+            "speed": 90
+        }
+    ],
+    "useless": [
+        {
+            "name": "Versadge",
+            "brief": "Has the unique power of making everything around it depressed",
+            "image": "https://i.imgur.com/6ve3DUa.png",
+            "hit_points": 70,
+            "attack_power": 80,
+            "speed": 100
+        },
+        {
+            "name": "Flaeme",
+            "brief": "An entity born from the flames of a raging fire, but lost all its powers from being misspelled",
+            "image": "https://i.imgur.com/aanHSsF.png",
+            "hit_points": 70,
+            "attack_power": 105,
+            "speed": 75
+        },
+        {
+            "name": "Master Y13",
+            "brief": "A self-proclaimed professional gamer",
+            "image": "https://i.imgur.com/k464Tqo.png",
+            "hit_points": 125,
+            "attack_power": 90,
+            "speed": 35
+        },
+        {
+            "name": "Lord Prime",
+            "brief": "Is secretly a bot",
+            "image": "https://i.imgur.com/WuPJBS8.png",
+            "hit_points": 35,
+            "attack_power": 45,
+            "speed": 170
+        },
+        {
+            "name": "Emvipee",
+            "brief": "Has grubby little hands with no social nor fiscal responsibilities",
+            "image": "https://i.imgur.com/yQPWfH2.png",
+            "hit_points": 60,
+            "attack_power": 110,
+            "speed": 80
+        }
+    ]
+}

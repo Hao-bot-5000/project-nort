@@ -9,6 +9,7 @@ from matplotlib import pyplot as plt
 from emoji      import emojize
 
 import discord
+from custom_errors import MemberNotFoundError
 import settings
 
 # Returns a path relative to the bot directory
@@ -82,7 +83,7 @@ def get_json_path(fname):
 # Retrieve json contents based on path URL
 # If file is not a valid JSON document, return an empty dictionary
 # If file cannot be opened, throws an error
-async def get_json_data(path):
+def get_json_data(path):
     try:
         json_file = open(path, "r")
         json_data = json.load(json_file)
@@ -94,7 +95,7 @@ async def get_json_data(path):
 
 # Modify json contents stored at path URL
 # If file cannot be opened, throws an error
-async def set_json_data(path, json_data):
+def set_json_data(path, json_data):
     json_file = open(path, "w")
     json.dump(json_data, json_file, indent=4)
     json_file.close()
@@ -164,7 +165,7 @@ def update_simple_graph(title, values, xlim=(), ylim=(), gradient=True, **kwargs
     buf.seek(0)
     return buf
 
-def get_simple_graph_num_points():
+def get_simple_graph_length():
     count = 0
     for line in plt.gca().get_lines():
         count += len(line.get_xdata())
@@ -177,19 +178,23 @@ def get_simple_graph_num_points():
 # Attempts to retrieve a member based on the message's mention
 # If no member is mentioned in the message, run a name-based and
 # id-based search to retrieve the member
-# If the member cannot be found, returns None
-async def get_mentioned_member(message, backup):
+# If the member cannot be found, raise error
+def get_mentioned_member(message, backup):
     guild = message.guild
     mentions = message.mentions
 
-    member = mentions[0] if mentions else guild.get_member_named(backup)
-    if not member:
-        try:
-            member = await guild.get_member(int(backup))
-        except ValueError:
-            pass
+    if len(mentions) > 0:
+        if len(mentions) != 1:
+            print("WARNING: message contains more than one mention")
+        return mentions[0]
 
-    return member
+    try:
+        member = guild.get_member_named(backup) or guild.get_member(int(backup))
+        if member is None:
+            raise ValueError("'member' cannot be NoneType")
+        return member
+    except ValueError:
+        raise MemberNotFoundError(backup)
 
 
 
