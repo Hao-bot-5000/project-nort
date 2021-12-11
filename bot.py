@@ -74,6 +74,12 @@ def main():
                 f"That command does not exist. For more information, please run " +
                 f"`{bot.command_prefix}help`"
             )
+        elif isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(
+                "You have not entered enough arguments. Please run " +
+                f"`{bot.command_prefix}help {error.args[0].split(' ')[-1]}` " + # TODO: find out of there exists cleaner ways to retrieve the command's name
+                "for more information on this command"
+            )
         elif isinstance(error, commands.TooManyArguments):
             await ctx.send(
                 "You have entered too many arguments. Please run " +
