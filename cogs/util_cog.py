@@ -34,14 +34,19 @@ class UtilCog(BaseCog, name="Utility"):
                     "by reacting to the given options (maximum of 10)"
     )
     @commands.guild_only()
-    # NOTE: unused variable at the end acts as filler so that the
-    #       'help' command does not cut off the 'options' variable
-    async def poll(self, ctx, message=None, *, options=()):
-        num_options = len(options)
-
+    async def poll(self, ctx, message: str=None, *options: str):
+        # TODO: figure out how to do command-specific error handling without triggering
+        # the global error handling function, unless the command-specif error handling
+        # function did not catch the error.
+        # For now, message is set as an 'optional' argument that returns a response if
+        # empty
         if message is None:
             await ctx.send(self.create_sample_poll_message(ctx.guild.owner.display_name))
             return
+
+        num_options = len(options)
+        if num_options > len(self.POLL_EMOJIS):
+            raise commands.TooManyArguments("poll")
 
         embed_reply = self.create_embed()
         embed_reply.set_author(
@@ -50,7 +55,7 @@ class UtilCog(BaseCog, name="Utility"):
         )
 
         self.add_poll_options(embed_reply, message, options, num_options)
-        await self.add_poll_reactions((await ctx.send(embed=embed_reply)), num_options)
+        await self.add_poll_reactions((await ctx.send(embed=embed_reply)), num_options)        
 
     ### Random Number Generator Command ###
     @commands.command(
@@ -58,7 +63,7 @@ class UtilCog(BaseCog, name="Utility"):
         description="Generates a random number between 1 and the given number"
     )
     @commands.guild_only()
-    async def roll(self, ctx, value=None):
+    async def roll(self, ctx, value: int=100):
         value = self.input_to_positive_int(value, 100)
         roll = randint(1, value)
 

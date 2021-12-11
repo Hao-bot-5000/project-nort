@@ -80,7 +80,7 @@ class NortMonsCog(BaseCog, name="NortMons"):
         description="Display a member's current NortMon"
     )
     @commands.guild_only()
-    async def nortmon(self, ctx, member: discord.Member=None):
+    async def nortmon(self, ctx, *, member: discord.Member=None):
         if member is None:
             member= ctx.author
 

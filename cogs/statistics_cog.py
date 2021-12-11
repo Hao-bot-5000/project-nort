@@ -15,7 +15,7 @@ class StatisticsCog(BaseCog, name="Statistics"):
         description="Displays the member's cringe meter"
     )
     @commands.guild_only()
-    async def cringemeter(self, ctx, member: discord.Member=None):
+    async def cringemeter(self, ctx, *, member: discord.Member=None):
         if member is None:
             member = ctx.author
 

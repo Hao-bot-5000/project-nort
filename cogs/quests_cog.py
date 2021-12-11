@@ -47,7 +47,7 @@ class QuestsCog(BaseCog, name="Quests"):
                     "(short, normal, long)"
     )
     @commands.guild_only()
-    async def expedition(self, ctx, level=None):
+    async def expedition(self, ctx, level: str=None):
         # Retrieve json contents
         member_data = self.get_member_data(ctx.guild, ctx.author, default=True)
 

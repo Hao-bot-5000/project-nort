@@ -240,6 +240,10 @@ class BaseCog(commands.Cog):
             ValueError:
                 the input could not be converted to a positive integer.
         """
-        value = int(input) if input is not None else default
-        if value < 1: raise ValueError("'input' must be greater than 0")
-        return value
+
+        try:
+            value = int(input) if input is not None else default
+            if value < 1: raise ValueError("'input' must be greater than 0")
+            return value
+        except ValueError:
+            raise commands.BadArgument()
