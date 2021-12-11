@@ -63,6 +63,8 @@ def main():
                   activity=discord.Game(name=settings.NOW_PLAYING))
         print("Logged in!", flush=True)
 
+    # NOTE: This event seems to not get triggered if an error is caught (by discord.py)
+    # before the command function is even invoked.
     @bot.before_invoke
     async def print_command_in_console(ctx):
         print(f"{ctx.author.name}: {ctx.message.content}")
@@ -87,10 +89,8 @@ def main():
                 "for more information on this command"
             )
         elif isinstance(error, commands.MemberNotFound):
-            print(dir(error))
             await ctx.send(f"Member {error.argument} could not be found in this server")
         elif isinstance(error, commands.BadArgument):
-            print(error.args)
             await ctx.send(
                 "You have entered an invalid argument. Please make sure that your " + 
                 "argument is a valid input for this command"
