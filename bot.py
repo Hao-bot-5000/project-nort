@@ -12,7 +12,6 @@ from multiprocessing                import Process
 
 from utils                          import (get_json_path, get_json_data, set_json_data,
                                             get_emoji)
-import custom_errors
 
 # Set to remember if the bot is already running, since on_ready may be called
 # more than once on reconnects
@@ -43,6 +42,10 @@ def main():
     for cog in COGS:
         bot.load_extension(cog)
 
+    # Modify default command values
+    for command in bot.commands:
+        command.ignore_extra = False
+
     # Define event handlers for the bot
     # on_ready may be called multiple times in the event of a reconnect,
     # hence the running flag
@@ -71,18 +74,20 @@ def main():
                 f"That command does not exist. For more information, please run " +
                 f"`{bot.command_prefix}help`"
             )
-        elif isinstance(error, custom_errors.TooManyArgumentsError):
+        elif isinstance(error, commands.TooManyArguments):
             await ctx.send(
                 "You have entered too many arguments. Please run " +
-                f"`{bot.command_prefix}help {error.command}` for more information " +
-                "on this command"
+                f"`{bot.command_prefix}help {error.args[0].split(' ')[-1]}` " + # TODO: find out of there exists cleaner ways to retrieve the command's name
+                "for more information on this command"
             )
-        elif isinstance(error, custom_errors.MemberNotFoundError):
-            await ctx.send(f"Member {error.member} could not be found in this server")
-        elif isinstance(error, custom_errors.InvalidTypeError):
+        elif isinstance(error, commands.MemberNotFound):
+            print(dir(error))
+            await ctx.send(f"Member {error.argument} could not be found in this server")
+        elif isinstance(error, commands.BadArgument):
+            print(error.args)
             await ctx.send(
                 "You have entered an invalid argument. Please make sure that your " + 
-                f"argument is a valid {error.type}"
+                "argument is a valid input for this command"
             )
         elif isinstance(error, ArgumentParsingError):
             await ctx.send(

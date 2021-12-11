@@ -8,7 +8,6 @@ from utils              import (get_json_path, get_json_data, set_json_data,
                                 dict_get_as_int, dict_get_as_list)
 
 from cogs.base_cog      import BaseCog
-from custom_errors      import TooManyArgumentsError
 
 class QuestsCog(BaseCog, name="Quests"):
     quests_data_path = get_json_path("quests")
@@ -23,10 +22,7 @@ class QuestsCog(BaseCog, name="Quests"):
         description="Claim 600 daily NortBucks every day (PT Time)"
     )
     @commands.guild_only()
-    async def daily(self, ctx, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("daily")
-
+    async def daily(self, ctx):
         member_data = self.get_member_data(ctx.guild, ctx.author, default=True)
 
         nort_bucks = dict_get_as_int(member_data, "nort_bucks", 0)
@@ -51,13 +47,8 @@ class QuestsCog(BaseCog, name="Quests"):
                     "(short, normal, long)"
     )
     @commands.guild_only()
-    async def expedition(self, ctx, level=None, *args):
-        # Checking for arguements
-        if len(args) > 0:
-            raise TooManyArgumentsError("expedition")
-
+    async def expedition(self, ctx, level=None):
         # Retrieve json contents
-
         member_data = self.get_member_data(ctx.guild, ctx.author, default=True)
 
         if member_data.get("on_expedition") == 0:

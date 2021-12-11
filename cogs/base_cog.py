@@ -2,8 +2,6 @@ import discord
 from discord.ext    import commands
 from utils          import get_json_path, get_json_data, set_json_data
 
-from custom_errors  import InvalidTypeError
-
 class BaseCog(commands.Cog):
     data_path = get_json_path("data")
     data = get_json_data(data_path)
@@ -239,11 +237,9 @@ class BaseCog(commands.Cog):
             
             Raises
             ------
-            InvalidTypeError:
+            ValueError:
                 the input could not be converted to a positive integer.
         """
         value = int(input) if input is not None else default
-        # NOTE: Do I really need to raise a custom error, or can I just raise ValueError?
-        if value < 1: raise InvalidTypeError("positive number")
-
+        if value < 1: raise ValueError("'input' must be greater than 0")
         return value

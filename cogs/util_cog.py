@@ -5,7 +5,6 @@ from cogs.base_cog      import BaseCog
 
 from random             import randint
 from utils              import get_emoji
-from custom_errors      import TooManyArgumentsError
 
 class UtilCog(BaseCog, name="Utility"):
     def __init__(self, bot):
@@ -17,9 +16,7 @@ class UtilCog(BaseCog, name="Utility"):
         description="Displays all available commands offered by this bot"
     )
     @commands.guild_only()
-    async def help(self, ctx, command=None, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("help")
+    async def help(self, ctx, command=None):
 
         try:
             await ctx.send(self.create_help_message(ctx.author, command))
@@ -39,11 +36,8 @@ class UtilCog(BaseCog, name="Utility"):
     @commands.guild_only()
     # NOTE: unused variable at the end acts as filler so that the
     #       'help' command does not cut off the 'options' variable
-    async def poll(self, ctx, message=None, *options, _=None):
+    async def poll(self, ctx, message=None, *, options=()):
         num_options = len(options)
-
-        if num_options > len(self.POLL_EMOJIS):
-            raise TooManyArgumentsError("poll")
 
         if message is None:
             await ctx.send(self.create_sample_poll_message(ctx.guild.owner.display_name))
@@ -64,10 +58,7 @@ class UtilCog(BaseCog, name="Utility"):
         description="Generates a random number between 1 and the given number"
     )
     @commands.guild_only()
-    async def roll(self, ctx, value=None, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("roll")
-
+    async def roll(self, ctx, value=None):
         value = self.input_to_positive_int(value, 100)
         roll = randint(1, value)
 
@@ -130,7 +121,7 @@ class UtilCog(BaseCog, name="Utility"):
         if command is not None:
             return mention + (
                 f"\n`{self.bot.command_prefix}{command.name}" +
-                "".join(f" <{p}>" for p in list(command.clean_params.keys())[:-1]) +
+                "".join(f" <{p}>" for p in list(command.clean_params.keys())) +
                 f"`: {command.description}" +
 
                 (f"\n\nAliases: `{', '.join(a for a in command.aliases)}`"
