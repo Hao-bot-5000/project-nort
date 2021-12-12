@@ -1,16 +1,16 @@
+from datetime                   import date, datetime
+from math                       import sqrt
+
 import discord
-from discord.ext        import commands
+from discord.ext                import commands
+from numpy                      import cumprod, exp, random
+from utils                      import (create_simple_graph, dict_get_as_int,
+                                        dict_get_as_list, get_emoji, get_json_data,
+                                        get_json_path, get_simple_graph_length,
+                                        set_json_data, update_simple_graph)
 
-from datetime           import datetime, date
-from numpy              import random, exp, cumprod
-from math               import sqrt
+from cogs.base_cog              import BaseCog
 
-from utils              import (get_json_path, get_json_data, set_json_data,
-                                get_emoji, create_simple_graph, update_simple_graph,
-                                get_simple_graph_length, dict_get_as_int,
-                                dict_get_as_list)
-
-from cogs.base_cog      import BaseCog
 
 class EconomyCog(BaseCog, name="Economy"):
     yash_coin_data_path = get_json_path("yash_coin")

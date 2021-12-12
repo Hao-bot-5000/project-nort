@@ -1,10 +1,10 @@
+from random                     import randint
+
 import discord
-from discord.ext        import commands
+from discord.ext                import commands
+from utils                      import get_emoji
 
-from cogs.base_cog      import BaseCog
-
-from random             import randint
-from utils              import get_emoji
+from cogs.base_cog              import BaseCog
 
 class UtilCog(BaseCog, name="Utility"):
     def __init__(self, bot):

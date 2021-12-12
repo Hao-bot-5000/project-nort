@@ -1,9 +1,7 @@
 import discord
-from discord.ext        import commands
+from discord.ext                import commands
 
-from cogs.base_cog      import BaseCog
-
-from discord.errors     import ClientException
+from cogs.base_cog              import BaseCog
 
 class MusicCog(BaseCog, name="Music"):
     def __init__(self, bot):
@@ -25,7 +23,7 @@ class MusicCog(BaseCog, name="Music"):
         try:
             await channel.connect()
             await ctx.send("playing music")
-        except ClientException:
+        except discord.ClientException:
             await ctx.send("NortBot is in a different voice channel")
 
     @commands.command(

@@ -1,14 +1,13 @@
-from os.path    import join
-from os         import remove
-
 import io
 import json
 import math
-from matplotlib import pyplot as plt
-
-from emoji      import emojize
+from os                         import remove
+from os.path                    import join
 
 import discord
+from emoji                      import emojize
+from matplotlib                 import pyplot as plt
+
 import settings
 
 # Returns a path relative to the bot directory

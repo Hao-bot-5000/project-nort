@@ -1,15 +1,14 @@
 import os
 import sys
 import traceback
-
-import settings
-import discord
-from discord.ext                    import commands
-
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from multiprocessing                import Process
 
-from utils                          import get_json_path, get_json_data, set_json_data
+import discord
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from discord.ext                    import commands
+
+import settings
+from utils                          import get_json_data, get_json_path, set_json_data
 
 # Set to remember if the bot is already running, since on_ready may be called
 # more than once on reconnects
@@ -27,7 +26,7 @@ intents.members = True
 COGS = [f"cogs.{filename[:-3]}" for filename in os.listdir("./cogs")
         if filename.endswith(".py") and filename != "base_cog.py"]
 
-###############################################################################
+#########################################################################################
 
 def main():
     # Initialize the bot
@@ -120,7 +119,7 @@ def main():
     # Finally, set the bot running
     bot.run(settings.BOT_TOKEN)
 
-###############################################################################
+#########################################################################################
 
 
 if __name__ == "__main__":

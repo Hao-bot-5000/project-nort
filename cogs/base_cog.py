@@ -1,6 +1,6 @@
 import discord
-from discord.ext    import commands
-from utils          import get_json_path, get_json_data, set_json_data
+from discord.ext                import commands
+from utils                      import get_json_data, get_json_path, set_json_data
 
 class BaseCog(commands.Cog):
     data_path = get_json_path("data")

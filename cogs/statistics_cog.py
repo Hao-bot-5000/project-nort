@@ -1,9 +1,8 @@
 import discord
-from discord.ext        import commands
+from discord.ext                import commands
+from utils                      import create_progress_bar, dict_get_as_float
 
-from utils              import dict_get_as_float, create_progress_bar
-
-from cogs.base_cog      import BaseCog
+from cogs.base_cog              import BaseCog
 
 class StatisticsCog(BaseCog, name="Statistics"):
     def __init__(self, bot):

@@ -1,11 +1,11 @@
+from random                     import randint, uniform
+
 import discord
-from discord.ext        import commands
+from discord.ext                import commands
+from utils                      import (dict_get_as_int, dict_get_as_list,
+                                        get_json_data, get_json_path, set_json_data)
 
-from random             import uniform, randint
-from utils              import (get_json_path, get_json_data, set_json_data,
-                                dict_get_as_int, dict_get_as_list)
-
-from cogs.base_cog      import BaseCog
+from cogs.base_cog              import BaseCog
 
 class NortMonsCog(BaseCog, name="NortMons"):
     nort_mons_data_path = get_json_path("nort_mons")
