@@ -1,7 +1,6 @@
 import os
 import sys
-
-from discord.ext.commands.errors import ArgumentParsingError
+import traceback
 
 import settings
 import discord
@@ -10,8 +9,7 @@ from discord.ext                    import commands
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from multiprocessing                import Process
 
-from utils                          import (get_json_path, get_json_data, set_json_data,
-                                            get_emoji)
+from utils                          import get_json_path, get_json_data, set_json_data
 
 # Set to remember if the bot is already running, since on_ready may be called
 # more than once on reconnects
@@ -73,37 +71,36 @@ def main():
     async def on_command_error(ctx, error):
         if isinstance(error, commands.CommandNotFound):
             await ctx.send(
-                f"That command does not exist. For more information, please run " +
+                "That command does not exist. For more information, please run " +
                 f"`{bot.command_prefix}help`"
             )
         elif isinstance(error, commands.MissingRequiredArgument):
             await ctx.send(
                 "You have not entered enough arguments. Please run " +
-                f"`{bot.command_prefix}help {error.args[0].split(' ')[-1]}` " + # TODO: find out of there exists cleaner ways to retrieve the command's name
+                f"`{bot.command_prefix}help {ctx.command}` " +
                 "for more information on this command"
             )
         elif isinstance(error, commands.TooManyArguments):
             await ctx.send(
                 "You have entered too many arguments. Please run " +
-                f"`{bot.command_prefix}help {error.args[0].split(' ')[-1]}` " + # TODO: find out of there exists cleaner ways to retrieve the command's name
+                f"`{bot.command_prefix}help {ctx.command}` " +
                 "for more information on this command"
             )
         elif isinstance(error, commands.MemberNotFound):
             await ctx.send(f"Member {error.argument} could not be found in this server")
         elif isinstance(error, commands.BadArgument):
             await ctx.send(
-                "You have entered an invalid argument. Please make sure that your " + 
+                "You have entered an invalid argument. Please make sure that your " +
                 "argument is a valid input for this command"
             )
-        elif isinstance(error, ArgumentParsingError):
+        elif isinstance(error, commands.ArgumentParsingError):
             await ctx.send(
-                f"You have entered an improper argument. Please make sure that " +
+                "You have entered an improper argument. Please make sure that " +
                 "your arguments are properly formatted"
             )
-            print(error) # in case it isn't just an issue with improper quotation marks
         else:
             await ctx.send("Something went wrong...")
-            raise error
+            traceback.print_exception(type(error), error, error.__traceback__)
 
     async def handle_guilds(guild, is_joining):
         path = get_json_path("data")
