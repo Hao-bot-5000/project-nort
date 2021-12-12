@@ -80,7 +80,7 @@ class QuestsCog(BaseCog, name="Quests"):
             
             Raises
             ------
-            ValueError:
+            LookupError:
                 the quest's data could not be found inside ``quest_list_data``.
         """
 
@@ -89,7 +89,7 @@ class QuestsCog(BaseCog, name="Quests"):
 
         quest_data = quest_list_data.get(quest_name)
         if not isinstance(quest_data, dict):
-            raise ValueError(f"Could not get quest data for '{quest_name}'")
+            raise LookupError(f"Could not get quest data for '{quest_name}'")
 
         return quest_data
 

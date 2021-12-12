@@ -21,7 +21,7 @@ class UtilCog(BaseCog, name="Utility"):
 
         try:
             await ctx.send(self.create_help_message(ctx.author, command))
-        except ValueError:
+        except LookupError:
             await ctx.send(
                 f"No command or category called '{command}' found; run " +
                 f"`{self.bot.command_prefix}help` for the list of all " +
@@ -108,7 +108,7 @@ class UtilCog(BaseCog, name="Utility"):
 
             Raises
             ------
-            ValueError:
+            LookupError:
                 a command or cog could not be found from ``input``.
         """
 
@@ -143,7 +143,7 @@ class UtilCog(BaseCog, name="Utility"):
                 f"\n**{cog.qualified_name}**:{self.cog_get_commands_as_str(cog)}"
             )
 
-        raise ValueError(f"Could not find a command or cog called '{input}'")
+        raise LookupError(f"Could not find a command or cog called '{input}'")
 
     def cog_get_commands_as_str(self, cog):
         """

@@ -32,7 +32,7 @@ class BaseCog(commands.Cog):
             
             Raises
             ------
-            ValueError:
+            LookupError:
                 the guild's data could not be found inside ``data``.
         """
 
@@ -42,7 +42,7 @@ class BaseCog(commands.Cog):
         guild_id = str(guild.id)
         guild_data = data.setdefault(guild_id, {}) if default else data.get(guild_id, {})
         if not isinstance(guild_data, dict):
-            raise ValueError(f"Could not get guild data for '{guild.id}'")
+            raise LookupError(f"Could not get guild data for '{guild.id}'")
 
         return guild_data
 
@@ -68,7 +68,7 @@ class BaseCog(commands.Cog):
             
             Raises
             ------
-            ValueError:
+            LookupError:
                 the member list data could not be found inside ``guild_data``.
         """
 
@@ -80,7 +80,7 @@ class BaseCog(commands.Cog):
             else guild_data.get("yc_members", {})
         )
         if not isinstance(member_list_data, dict):
-            raise ValueError(f"Could not get members list for '{guild.id}'")
+            raise LookupError(f"Could not get members list for '{guild.id}'")
 
         return member_list_data
 
@@ -109,7 +109,7 @@ class BaseCog(commands.Cog):
             
             Raises
             ------
-            ValueError:
+            LookupError:
                 the guild member's data could not be found inside ``member_list_data``.
         """
 
@@ -122,7 +122,7 @@ class BaseCog(commands.Cog):
             else member_list_data.get(member_id, {})
         )
         if not isinstance(member_data, dict):
-            raise ValueError(f"Could not get member data for '{guild.id}-{member.id}'")
+            raise LookupError(f"Could not get member data for '{guild.id}-{member.id}'")
 
         return member_data
 
@@ -237,7 +237,7 @@ class BaseCog(commands.Cog):
             
             Raises
             ------
-            ValueError:
+            discord.BadArgument:
                 the input could not be converted to a positive integer.
         """
 

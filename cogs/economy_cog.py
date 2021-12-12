@@ -81,7 +81,7 @@ class EconomyCog(BaseCog, name="Economy"):
             try:
                 old_values = self.get_yash_coin_values(self.yash_coin_data)
                 new_values = self.create_yash_coin_values(old_values[-1])
-            except ValueError:
+            except LookupError:
                 new_values = self.create_yash_coin_values()
 
             self.yash_coin_data["prev_check"] = today
@@ -97,7 +97,7 @@ class EconomyCog(BaseCog, name="Economy"):
             # Update graph values
             try:
                 values = self.get_yash_coin_values(self.yash_coin_data)
-            except ValueError:
+            except LookupError:
                 values = self.create_yash_coin_values()
 
             indices = len(values)
@@ -182,7 +182,7 @@ class EconomyCog(BaseCog, name="Economy"):
 
             Raises
             ------
-            ValueError:
+            LookupError:
                 the YashCoin values could not be found inside ``yash_coin_data``.
         """
 
@@ -191,7 +191,7 @@ class EconomyCog(BaseCog, name="Economy"):
 
         yash_coin_values = dict_get_as_list(yash_coin_data, "values")
         if not yash_coin_values:
-            raise ValueError("YashCoin values could not be properly retrieved")
+            raise LookupError("YashCoin values could not be properly retrieved")
 
         return yash_coin_values
 
