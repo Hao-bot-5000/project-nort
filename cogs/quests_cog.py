@@ -19,7 +19,8 @@ class QuestsCog(BaseCog, name="Quests"):
     ### Daily Claim Command ###
     @commands.command(
         brief="Claim 600 daily NortBucks",
-        description="Claim 600 daily NortBucks every day (PT Time)"
+        description="Claim 600 daily NortBucks every day (PT Time)",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def daily(self, ctx):
@@ -44,7 +45,8 @@ class QuestsCog(BaseCog, name="Quests"):
         aliases=["exp"],
         brief="Go on expedition to find NortBucks",
         description="Start an expedition based on the given level "
-                    "(short, normal, long)"
+                    "(short, normal, long)",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def expedition(self, ctx, level: str=None):

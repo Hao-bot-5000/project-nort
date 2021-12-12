@@ -12,7 +12,8 @@ class StatisticsCog(BaseCog, name="Statistics"):
     @commands.command(
         aliases=["cm"],
         brief="Displays cringe meter",
-        description="Displays the member's cringe meter"
+        description="Displays the member's cringe meter",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def cringemeter(self, ctx, *, member: discord.Member=None):

@@ -19,7 +19,8 @@ class NortMonsCog(BaseCog, name="NortMons"):
     @commands.command(
         brief="Catch NortMon",
         description="Use your NortBucks to catch yourself a Nortmon of a random rarity "
-                    "from the wild"
+                    "from the wild",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def catch(self, ctx):
@@ -53,7 +54,8 @@ class NortMonsCog(BaseCog, name="NortMons"):
 
     @commands.command(
         brief="Release NortMon",
-        description="Release your current NortMon into the wild"
+        description="Release your current NortMon into the wild",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def release(self, ctx):
@@ -77,7 +79,8 @@ class NortMonsCog(BaseCog, name="NortMons"):
 
     @commands.command(
         brief="Display NortMon",
-        description="Display a member's current NortMon"
+        description="Display a member's current NortMon",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def nortmon(self, ctx, *, member: discord.Member=None):

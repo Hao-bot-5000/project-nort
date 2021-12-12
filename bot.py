@@ -40,10 +40,6 @@ def main():
     for cog in COGS:
         bot.load_extension(cog)
 
-    # Modify default command values
-    for command in bot.commands:
-        command.ignore_extra = False
-
     # Define event handlers for the bot
     # on_ready may be called multiple times in the event of a reconnect,
     # hence the running flag

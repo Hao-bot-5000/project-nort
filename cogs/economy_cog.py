@@ -24,7 +24,8 @@ class EconomyCog(BaseCog, name="Economy"):
     @commands.command(
         aliases=["bal"],
         brief="Displays balance",
-        description="Displays the member's current balance"
+        description="Displays the member's current balance",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def balance(self, ctx, *, member: discord.Member=None):
@@ -67,7 +68,8 @@ class EconomyCog(BaseCog, name="Economy"):
     @commands.command(
         aliases=["stonks"],
         brief="Displays YashCoin values",
-        description="Displays the current YashCoin conversion rate"
+        description="Displays the current YashCoin conversion rate",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def stocks(self, ctx):
@@ -137,7 +139,8 @@ class EconomyCog(BaseCog, name="Economy"):
     @commands.command(
         aliases=["buy"],
         brief="Invest into YashCoin",
-        description="Buy the given number of YashCoin shares using NortBucks"
+        description="Buy the given number of YashCoin shares using NortBucks",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def invest(self, ctx, amount: int=0):
@@ -149,7 +152,8 @@ class EconomyCog(BaseCog, name="Economy"):
     @commands.command(
         aliases=["sell"],
         brief="Divest from YashCoin",
-        description="Sell the given number of YashCoin shares for NortBucks"
+        description="Sell the given number of YashCoin shares for NortBucks",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def divest(self, ctx, amount: int=0):

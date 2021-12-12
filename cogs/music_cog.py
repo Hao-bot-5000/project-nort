@@ -12,7 +12,8 @@ class MusicCog(BaseCog, name="Music"):
     @commands.command(
         aliases=["p"],
         brief="Plays music",
-        description="Joins the channel and plays music"
+        description="Joins the channel and plays music",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def play(self, ctx):
@@ -30,7 +31,8 @@ class MusicCog(BaseCog, name="Music"):
     @commands.command(
         aliases=["s", "l", "leave"],
         brief="Stops music",
-        description="Stops music and leaves the channel"
+        description="Stops music and leaves the channel",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def stop(self, ctx):

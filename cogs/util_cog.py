@@ -13,10 +13,11 @@ class UtilCog(BaseCog, name="Utility"):
     ### Help Command ###
     @commands.command(
         brief="Displays commands",
-        description="Displays all available commands offered by this bot"
+        description="Displays all available commands offered by this bot",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def help(self, ctx, command=None):
+    async def help(self, ctx, command: str=None):
 
         try:
             await ctx.send(self.create_help_message(ctx.author, command))
@@ -31,7 +32,8 @@ class UtilCog(BaseCog, name="Utility"):
     @commands.command(
         brief="Generates poll",
         description="Generates a poll that members can participate in "
-                    "by reacting to the given options (maximum of 10)"
+                    "by reacting to the given options (maximum of 10)",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def poll(self, ctx, message: str=None, *options: str):
@@ -60,7 +62,8 @@ class UtilCog(BaseCog, name="Utility"):
     ### Random Number Generator Command ###
     @commands.command(
         brief="Generates random number",
-        description="Generates a random number between 1 and the given number"
+        description="Generates a random number between 1 and the given number",
+        ignore_extra=False
     )
     @commands.guild_only()
     async def roll(self, ctx, value: int=100):
@@ -74,7 +77,8 @@ class UtilCog(BaseCog, name="Utility"):
     ### Reload Command ###
     @commands.command(
         brief="Reload commands (me only)",
-        description="Reload all commands, useful for quick updates"
+        description="Reload all commands, useful for quick updates",
+        ignore_extra=False
     )
     @commands.is_owner()
     async def reload(self, ctx):
