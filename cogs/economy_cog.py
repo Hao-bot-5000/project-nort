@@ -143,7 +143,7 @@ class EconomyCog(BaseCog, name="Economy"):
         ignore_extra=False
     )
     @commands.guild_only()
-    async def invest(self, ctx, amount: int=0):
+    async def invest(self, ctx, amount: int=1):
         cost = await self.handle_investment(ctx, self.input_to_positive_int(amount))
         if cost is not None:
             await ctx.send(f"Thank you for investing `{cost}` NortBucks into YashCoin!")
@@ -156,7 +156,7 @@ class EconomyCog(BaseCog, name="Economy"):
         ignore_extra=False
     )
     @commands.guild_only()
-    async def divest(self, ctx, amount: int=0):
+    async def divest(self, ctx, amount: int=1):
         cost = await self.handle_investment(ctx, -self.input_to_positive_int(amount))
         if cost is not None:
             await ctx.send(f"You received `{-cost}` NortBucks from selling YashCoins!")
