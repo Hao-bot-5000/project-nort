@@ -22,8 +22,8 @@ class BaseCog(commands.Cog):
             data: :class:`dict, optional`
                 the JSON object.
             default: :class:`boolean, optional`
-                a truth value determining whether to insert a default value if the data
-                does not exist.
+                a value determining whether to insert a default value if the data does
+                not exist.
 
             Returns
             -------
@@ -58,8 +58,8 @@ class BaseCog(commands.Cog):
             guild_data: :class:`dict, optional`
                 a guild's data.
             default: :class:`boolean, optional`
-                a truth value determining whether to insert a default value if the data
-                does not exist.
+                a value determining whether to insert a default value if the data does
+                not exist.
 
             Returns
             -------
@@ -99,8 +99,8 @@ class BaseCog(commands.Cog):
             member_list_data: :class:`dict, optional`
                 the data of members in the guild.
             default: :class:`boolean, optional`
-                a truth value determining whether to insert a default value if the data
-                does not exist.
+                a value determining whether to insert a default value if the data does
+                not exist.
 
             Returns
             -------
@@ -202,6 +202,41 @@ class BaseCog(commands.Cog):
 
         for emoji in emojis:
             await message.add_reaction(emoji)  
+
+    @staticmethod
+    def command_error_set_resolved(ctx, value):
+        """
+            Attach a value to the context indicating whether a command error has been
+            resolved by a local command error handler.
+
+            Parameters
+            ----------
+            ctx: :class:`discord.Context`
+                the current context for a command sent by a member.
+            value: :class:`bool`
+                a value to attach to the context.
+        """
+
+        ctx.kwargs["resolved_local"] = value
+
+    @staticmethod
+    def command_error_is_resolved(ctx):
+        """
+            Return a value indicating whether a command error has been resolved by a
+            local command error handler.
+
+            Parameters
+            ----------
+            ctx: :class:`discord.Context`
+                the current context for a command sent by a member.
+            
+            Returns
+            -------
+            resolved: :class:`bool`
+                a value indicating whether a command has been resolved locally.
+        """
+
+        return ctx.kwargs.get("resolved_local", False)
 
     @staticmethod
     def create_embed():

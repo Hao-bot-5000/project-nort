@@ -36,19 +36,10 @@ class UtilCog(BaseCog, name="Utility"):
         ignore_extra=False
     )
     @commands.guild_only()
-    async def poll(self, ctx, message: str=None, *options: str):
-        # TODO: figure out how to do command-specific error handling without triggering
-        # the global error handling function, unless the command-specif error handling
-        # function did not catch the error.
-        # For now, message is set as an 'optional' argument that returns a response if
-        # empty
-        if message is None:
-            await ctx.send(self.create_sample_poll_message(ctx.guild.owner.display_name))
-            return
-
+    async def poll(self, ctx, message: str, *options: str):
         num_options = len(options)
         if num_options > len(self.POLL_EMOJIS):
-            raise commands.TooManyArguments("poll")
+            raise commands.TooManyArguments("cannot have more than 10 poll options")
 
         embed_reply = self.create_embed()
         embed_reply.set_author(
@@ -57,7 +48,16 @@ class UtilCog(BaseCog, name="Utility"):
         )
 
         self.add_poll_options(embed_reply, message, options, num_options)
-        await self.add_poll_reactions((await ctx.send(embed=embed_reply)), num_options)        
+        await self.add_poll_reactions((await ctx.send(embed=embed_reply)), num_options)
+
+    @poll.error
+    async def poll_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(self.create_sample_poll_message(ctx.guild.owner.display_name))
+        else:
+            return
+
+        self.command_error_set_resolved(ctx, True)
 
     ### Random Number Generator Command ###
     @commands.command(

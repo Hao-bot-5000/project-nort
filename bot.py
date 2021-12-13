@@ -62,8 +62,13 @@ def main():
     async def print_command_in_console(ctx):
         print(f"{ctx.author.name}: {ctx.message.content}")
 
+    # Global command error handling
     @bot.event
     async def on_command_error(ctx, error):
+        # Command error was resolved on the local level
+        if ctx.cog and ctx.cog.command_error_is_resolved(ctx):
+            return
+
         if isinstance(error, commands.CommandNotFound):
             await ctx.send(
                 "That command does not exist. For more information, please run " +
