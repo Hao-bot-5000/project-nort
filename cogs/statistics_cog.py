@@ -1,11 +1,8 @@
 import discord
-from discord.ext        import commands
+from discord.ext                import commands
+from utils                      import create_progress_bar, dict_get_as_float
 
-from utils              import (get_mentioned_member, dict_get_as_float, 
-                                create_progress_bar)
-
-from cogs.base_cog      import BaseCog
-from custom_errors      import TooManyArgumentsError, MemberNotFoundError
+from cogs.base_cog              import BaseCog
 
 class StatisticsCog(BaseCog, name="Statistics"):
     def __init__(self, bot):
@@ -14,27 +11,22 @@ class StatisticsCog(BaseCog, name="Statistics"):
     @commands.command(
         aliases=["cm"],
         brief="Displays cringe meter",
-        description="Displays the member's cringe meter"
+        description="Displays the member's cringe meter",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def cringemeter(self, ctx, member=None, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("cringemeter")
+    async def cringemeter(self, ctx, *, member: discord.Member=None):
+        if member is None:
+            member = ctx.author
 
-        target_member = (
-            ctx.author if member is None else 
-            get_mentioned_member(ctx.message, backup=member)
-        )
-        print(target_member)
-
-        member_data = self.get_member_data(ctx.guild, target_member)
+        member_data = self.get_member_data(ctx.guild, member)
         cringe_meter = dict_get_as_float(member_data, "cringe_meter")
         percent, bar = create_progress_bar(cringe_meter)
 
         embed_reply = self.create_embed()
         embed_reply.set_author(
-            name=f"{target_member.display_name}'s Cringe Meter:",
-            icon_url=target_member.avatar_url
+            name=f"{member.display_name}'s Cringe Meter:",
+            icon_url=member.avatar_url
         )
         embed_reply.description = (
             f"**Status** `{self.get_cringe_status(percent)}`\n**{percent}%** `{bar}`"

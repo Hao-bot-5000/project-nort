@@ -1,12 +1,11 @@
+from random                     import randint, uniform
+
 import discord
-from discord.ext        import commands
+from discord.ext                import commands
+from utils                      import (dict_get_as_int, dict_get_as_list,
+                                        get_json_data, get_json_path, set_json_data)
 
-from random             import uniform, randint
-from utils              import (get_json_path, get_json_data, set_json_data,
-                                dict_get_as_int, dict_get_as_list, get_mentioned_member)
-
-from cogs.base_cog      import BaseCog
-from custom_errors      import TooManyArgumentsError, MemberNotFoundError
+from cogs.base_cog              import BaseCog
 
 class NortMonsCog(BaseCog, name="NortMons"):
     nort_mons_data_path = get_json_path("nort_mons")
@@ -20,13 +19,11 @@ class NortMonsCog(BaseCog, name="NortMons"):
     @commands.command(
         brief="Catch NortMon",
         description="Use your NortBucks to catch yourself a Nortmon of a random rarity "
-                    "from the wild"
+                    "from the wild",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def catch(self, ctx, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("catch")
-
+    async def catch(self, ctx):
         member_data = self.get_member_data(ctx.guild, ctx.author, default=True)
         member_nort_mon = member_data.get("nort_mon")
 
@@ -57,13 +54,11 @@ class NortMonsCog(BaseCog, name="NortMons"):
 
     @commands.command(
         brief="Release NortMon",
-        description="Release your current NortMon into the wild"
+        description="Release your current NortMon into the wild",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def release(self, ctx, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("release")
-
+    async def release(self, ctx):
         member_data = self.get_member_data(ctx.guild, ctx.author)
         member_nort_mon = member_data.get("nort_mon")
 
@@ -84,25 +79,21 @@ class NortMonsCog(BaseCog, name="NortMons"):
 
     @commands.command(
         brief="Display NortMon",
-        description="Display a member's current NortMon"
+        description="Display a member's current NortMon",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def nortmon(self, ctx, member=None, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("nortmon")
+    async def nortmon(self, ctx, *, member: discord.Member=None):
+        if member is None:
+            member= ctx.author
 
-        target_member = (
-            ctx.author if member is None else 
-            get_mentioned_member(ctx.message, backup=member)
-        )
-
-        member_data = self.get_member_data(ctx.guild, target_member)
+        member_data = self.get_member_data(ctx.guild, member)
         nort_mon_id = member_data.get("nort_mon") # TODO: create dict_get_as_str method?
 
         if nort_mon_id is None:
             await ctx.send(
-                "You do not own a NortMon" if target_member is ctx.author else
-                f"{target_member.display_name} does not own a NortMon"
+                "You do not own a NortMon" if member is ctx.author else
+                f"{member.display_name} does not own a NortMon"
             )
             return
 
@@ -118,8 +109,8 @@ class NortMonsCog(BaseCog, name="NortMons"):
 
         embed_reply = self.create_embed()
         embed_reply.set_author(
-            name=f"{target_member.display_name}'s NortMon:",
-            icon_url=target_member.avatar_url
+            name=f"{member.display_name}'s NortMon:",
+            icon_url=member.avatar_url
         )
         embed_reply.add_field(
             name=f"**{rarity.capitalize()} — {name}**",

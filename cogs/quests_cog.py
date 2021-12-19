@@ -1,14 +1,12 @@
-import discord
-from discord.ext        import commands
-
 import asyncio
-from datetime           import date
+from datetime                   import date
 
-from utils              import (get_json_path, get_json_data, set_json_data,
-                                dict_get_as_int, dict_get_as_list)
+import discord
+from discord.ext                import commands
+from utils                      import (dict_get_as_int, dict_get_as_list,
+                                        get_json_data, get_json_path, set_json_data)
 
-from cogs.base_cog      import BaseCog
-from custom_errors      import TooManyArgumentsError
+from cogs.base_cog              import BaseCog
 
 class QuestsCog(BaseCog, name="Quests"):
     quests_data_path = get_json_path("quests")
@@ -20,13 +18,11 @@ class QuestsCog(BaseCog, name="Quests"):
     ### Daily Claim Command ###
     @commands.command(
         brief="Claim 600 daily NortBucks",
-        description="Claim 600 daily NortBucks every day (PT Time)"
+        description="Claim 600 daily NortBucks every day (PT Time)",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def daily(self, ctx, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("daily")
-
+    async def daily(self, ctx):
         member_data = self.get_member_data(ctx.guild, ctx.author, default=True)
 
         nort_bucks = dict_get_as_int(member_data, "nort_bucks", 0)
@@ -48,16 +44,12 @@ class QuestsCog(BaseCog, name="Quests"):
         aliases=["exp"],
         brief="Go on expedition to find NortBucks",
         description="Start an expedition based on the given level "
-                    "(short, normal, long)"
+                    "(short, normal, long)",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def expedition(self, ctx, level=None, *args):
-        # Checking for arguements
-        if len(args) > 0:
-            raise TooManyArgumentsError("expedition")
-
+    async def expedition(self, ctx, level: str=None):
         # Retrieve json contents
-
         member_data = self.get_member_data(ctx.guild, ctx.author, default=True)
 
         if member_data.get("on_expedition") == 0:
@@ -88,7 +80,7 @@ class QuestsCog(BaseCog, name="Quests"):
             
             Raises
             ------
-            ValueError:
+            LookupError:
                 the quest's data could not be found inside ``quest_list_data``.
         """
 
@@ -97,7 +89,7 @@ class QuestsCog(BaseCog, name="Quests"):
 
         quest_data = quest_list_data.get(quest_name)
         if not isinstance(quest_data, dict):
-            raise ValueError(f"Could not get quest data for '{quest_name}'")
+            raise LookupError(f"Could not get quest data for '{quest_name}'")
 
         return quest_data
 

@@ -1,11 +1,10 @@
+from random                     import randint
+
 import discord
-from discord.ext        import commands
+from discord.ext                import commands
+from utils                      import get_emoji
 
-from cogs.base_cog      import BaseCog
-
-from random             import randint
-from utils              import get_emoji
-from custom_errors      import TooManyArgumentsError
+from cogs.base_cog              import BaseCog
 
 class UtilCog(BaseCog, name="Utility"):
     def __init__(self, bot):
@@ -14,16 +13,15 @@ class UtilCog(BaseCog, name="Utility"):
     ### Help Command ###
     @commands.command(
         brief="Displays commands",
-        description="Displays all available commands offered by this bot"
+        description="Displays all available commands offered by this bot",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def help(self, ctx, command=None, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("help")
+    async def help(self, ctx, command: str=None):
 
         try:
             await ctx.send(self.create_help_message(ctx.author, command))
-        except ValueError:
+        except LookupError:
             await ctx.send(
                 f"No command or category called '{command}' found; run " +
                 f"`{self.bot.command_prefix}help` for the list of all " +
@@ -34,20 +32,14 @@ class UtilCog(BaseCog, name="Utility"):
     @commands.command(
         brief="Generates poll",
         description="Generates a poll that members can participate in "
-                    "by reacting to the given options (maximum of 10)"
+                    "by reacting to the given options (maximum of 10)",
+        ignore_extra=False
     )
     @commands.guild_only()
-    # NOTE: unused variable at the end acts as filler so that the
-    #       'help' command does not cut off the 'options' variable
-    async def poll(self, ctx, message=None, *options, _=None):
+    async def poll(self, ctx, message: str, *options: str):
         num_options = len(options)
-
         if num_options > len(self.POLL_EMOJIS):
-            raise TooManyArgumentsError("poll")
-
-        if message is None:
-            await ctx.send(self.create_sample_poll_message(ctx.guild.owner.display_name))
-            return
+            raise commands.TooManyArguments("cannot have more than 10 poll options")
 
         embed_reply = self.create_embed()
         embed_reply.set_author(
@@ -58,16 +50,23 @@ class UtilCog(BaseCog, name="Utility"):
         self.add_poll_options(embed_reply, message, options, num_options)
         await self.add_poll_reactions((await ctx.send(embed=embed_reply)), num_options)
 
+    @poll.error
+    async def poll_error(self, ctx, error):
+        if isinstance(error, commands.MissingRequiredArgument):
+            await ctx.send(self.create_sample_poll_message(ctx.guild.owner.display_name))
+        else:
+            return
+
+        self.command_error_set_resolved(ctx, True)
+
     ### Random Number Generator Command ###
     @commands.command(
         brief="Generates random number",
-        description="Generates a random number between 1 and the given number"
+        description="Generates a random number between 1 and the given number",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def roll(self, ctx, value=None, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("roll")
-
+    async def roll(self, ctx, value: int=100):
         value = self.input_to_positive_int(value, 100)
         roll = randint(1, value)
 
@@ -78,7 +77,8 @@ class UtilCog(BaseCog, name="Utility"):
     ### Reload Command ###
     @commands.command(
         brief="Reload commands (me only)",
-        description="Reload all commands, useful for quick updates"
+        description="Reload all commands, useful for quick updates",
+        ignore_extra=False
     )
     @commands.is_owner()
     async def reload(self, ctx):
@@ -108,7 +108,7 @@ class UtilCog(BaseCog, name="Utility"):
 
             Raises
             ------
-            ValueError:
+            LookupError:
                 a command or cog could not be found from ``input``.
         """
 
@@ -130,7 +130,7 @@ class UtilCog(BaseCog, name="Utility"):
         if command is not None:
             return mention + (
                 f"\n`{self.bot.command_prefix}{command.name}" +
-                "".join(f" <{p}>" for p in list(command.clean_params.keys())[:-1]) +
+                "".join(f" <{p}>" for p in list(command.clean_params.keys())) +
                 f"`: {command.description}" +
 
                 (f"\n\nAliases: `{', '.join(a for a in command.aliases)}`"
@@ -143,7 +143,7 @@ class UtilCog(BaseCog, name="Utility"):
                 f"\n**{cog.qualified_name}**:{self.cog_get_commands_as_str(cog)}"
             )
 
-        raise ValueError(f"Could not find a command or cog called '{input}'")
+        raise LookupError(f"Could not find a command or cog called '{input}'")
 
     def cog_get_commands_as_str(self, cog):
         """
