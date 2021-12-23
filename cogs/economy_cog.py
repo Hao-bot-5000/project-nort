@@ -1,17 +1,16 @@
+from datetime                   import date, datetime
+from math                       import sqrt
+
 import discord
-from discord.ext        import commands
+from discord.ext                import commands
+from numpy                      import cumprod, exp, random
+from utils                      import (create_simple_graph, dict_get_as_int,
+                                        dict_get_as_list, get_emoji, get_json_data,
+                                        get_json_path, get_simple_graph_length,
+                                        set_json_data, update_simple_graph)
 
-from datetime           import datetime, date
-from numpy              import random, exp, linspace, cumprod
-from math               import sqrt
+from cogs.base_cog              import BaseCog
 
-from utils              import (get_json_path, get_json_data, set_json_data,
-                                get_emoji, create_simple_graph, update_simple_graph,
-                                get_simple_graph_length, get_mentioned_member, 
-                                dict_get_as_int, dict_get_as_list)
-
-from cogs.base_cog      import BaseCog
-from custom_errors      import TooManyArgumentsError, MemberNotFoundError
 
 class EconomyCog(BaseCog, name="Economy"):
     yash_coin_data_path = get_json_path("yash_coin")
@@ -25,19 +24,15 @@ class EconomyCog(BaseCog, name="Economy"):
     @commands.command(
         aliases=["bal"],
         brief="Displays balance",
-        description="Displays the member's current balance"
+        description="Displays the member's current balance",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def balance(self, ctx, member=None, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("balance")
+    async def balance(self, ctx, *, member: discord.Member=None):
+        if member is None:
+            member = ctx.author
 
-        target_member = (
-            ctx.author if member is None else 
-            get_mentioned_member(ctx.message, backup=member)
-        )
-
-        member_data = self.get_member_data(ctx.guild, target_member)
+        member_data = self.get_member_data(ctx.guild, member)
         nort_bucks = dict_get_as_int(member_data, "nort_bucks")
         yash_coins = dict_get_as_int(member_data, "yash_coins")
 
@@ -47,8 +42,8 @@ class EconomyCog(BaseCog, name="Economy"):
         
         embed_reply = self.create_embed()
         embed_reply.set_author(
-            name=f"{target_member.display_name}'s Balance:",
-            icon_url=target_member.avatar_url
+            name=f"{member.display_name}'s Balance:",
+            icon_url=member.avatar_url
         )
         embed_reply.add_field(
             name=f"**YashCoins** {get_emoji(':coin:')}",
@@ -73,13 +68,11 @@ class EconomyCog(BaseCog, name="Economy"):
     @commands.command(
         aliases=["stonks"],
         brief="Displays YashCoin values",
-        description="Displays the current YashCoin conversion rate"
+        description="Displays the current YashCoin conversion rate",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def stocks(self, ctx, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("stocks")
-
+    async def stocks(self, ctx):
         now = datetime.now()
         today = str(date.today())
 
@@ -88,7 +81,7 @@ class EconomyCog(BaseCog, name="Economy"):
             try:
                 old_values = self.get_yash_coin_values(self.yash_coin_data)
                 new_values = self.create_yash_coin_values(old_values[-1])
-            except ValueError:
+            except LookupError:
                 new_values = self.create_yash_coin_values()
 
             self.yash_coin_data["prev_check"] = today
@@ -104,7 +97,7 @@ class EconomyCog(BaseCog, name="Economy"):
             # Update graph values
             try:
                 values = self.get_yash_coin_values(self.yash_coin_data)
-            except ValueError:
+            except LookupError:
                 values = self.create_yash_coin_values()
 
             indices = len(values)
@@ -146,13 +139,11 @@ class EconomyCog(BaseCog, name="Economy"):
     @commands.command(
         aliases=["buy"],
         brief="Invest into YashCoin",
-        description="Buy the given number of YashCoin shares using NortBucks"
+        description="Buy the given number of YashCoin shares using NortBucks",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def invest(self, ctx, amount=None, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("invest")
-
+    async def invest(self, ctx, amount: int=1):
         cost = await self.handle_investment(ctx, self.input_to_positive_int(amount))
         if cost is not None:
             await ctx.send(f"Thank you for investing `{cost}` NortBucks into YashCoin!")
@@ -161,13 +152,11 @@ class EconomyCog(BaseCog, name="Economy"):
     @commands.command(
         aliases=["sell"],
         brief="Divest from YashCoin",
-        description="Sell the given number of YashCoin shares for NortBucks"
+        description="Sell the given number of YashCoin shares for NortBucks",
+        ignore_extra=False
     )
     @commands.guild_only()
-    async def divest(self, ctx, amount=None, *args):
-        if len(args) > 0:
-            raise TooManyArgumentsError("divest")
-
+    async def divest(self, ctx, amount: int=1):
         cost = await self.handle_investment(ctx, -self.input_to_positive_int(amount))
         if cost is not None:
             await ctx.send(f"You received `{-cost}` NortBucks from selling YashCoins!")
@@ -193,7 +182,7 @@ class EconomyCog(BaseCog, name="Economy"):
 
             Raises
             ------
-            ValueError:
+            LookupError:
                 the YashCoin values could not be found inside ``yash_coin_data``.
         """
 
@@ -202,7 +191,7 @@ class EconomyCog(BaseCog, name="Economy"):
 
         yash_coin_values = dict_get_as_list(yash_coin_data, "values")
         if not yash_coin_values:
-            raise ValueError("YashCoin values could not be properly retrieved")
+            raise LookupError("YashCoin values could not be properly retrieved")
 
         return yash_coin_values
 

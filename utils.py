@@ -1,15 +1,13 @@
-from os.path    import join
-from os         import remove
-
 import io
 import json
 import math
-from matplotlib import pyplot as plt
-
-from emoji      import emojize
+from os                         import remove
+from os.path                    import join
 
 import discord
-from custom_errors import MemberNotFoundError
+from emoji                      import emojize
+from matplotlib                 import pyplot as plt
+
 import settings
 
 # Returns a path relative to the bot directory
@@ -171,30 +169,6 @@ def get_simple_graph_length():
         count += len(line.get_xdata())
 
     return count
-
-
-
-### Member Searching Helpers ###
-# Attempts to retrieve a member based on the message's mention
-# If no member is mentioned in the message, run a name-based and
-# id-based search to retrieve the member
-# If the member cannot be found, raise error
-def get_mentioned_member(message, backup):
-    guild = message.guild
-    mentions = message.mentions
-
-    if len(mentions) > 0:
-        if len(mentions) != 1:
-            print("WARNING: message contains more than one mention")
-        return mentions[0]
-
-    try:
-        member = guild.get_member_named(backup) or guild.get_member(int(backup))
-        if member is None:
-            raise ValueError("'member' cannot be NoneType")
-        return member
-    except ValueError:
-        raise MemberNotFoundError(backup)
 
 
 

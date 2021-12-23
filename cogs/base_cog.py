@@ -1,8 +1,6 @@
 import discord
-from discord.ext    import commands
-from utils          import get_json_path, get_json_data, set_json_data
-
-from custom_errors  import InvalidTypeError
+from discord.ext                import commands
+from utils                      import get_json_data, get_json_path, set_json_data
 
 class BaseCog(commands.Cog):
     data_path = get_json_path("data")
@@ -24,8 +22,8 @@ class BaseCog(commands.Cog):
             data: :class:`dict, optional`
                 the JSON object.
             default: :class:`boolean, optional`
-                a truth value determining whether to insert a default value if the data
-                does not exist.
+                a value determining whether to insert a default value if the data does
+                not exist.
 
             Returns
             -------
@@ -34,7 +32,7 @@ class BaseCog(commands.Cog):
             
             Raises
             ------
-            ValueError:
+            LookupError:
                 the guild's data could not be found inside ``data``.
         """
 
@@ -44,7 +42,7 @@ class BaseCog(commands.Cog):
         guild_id = str(guild.id)
         guild_data = data.setdefault(guild_id, {}) if default else data.get(guild_id, {})
         if not isinstance(guild_data, dict):
-            raise ValueError(f"Could not get guild data for '{guild.id}'")
+            raise LookupError(f"Could not get guild data for '{guild.id}'")
 
         return guild_data
 
@@ -60,8 +58,8 @@ class BaseCog(commands.Cog):
             guild_data: :class:`dict, optional`
                 a guild's data.
             default: :class:`boolean, optional`
-                a truth value determining whether to insert a default value if the data
-                does not exist.
+                a value determining whether to insert a default value if the data does
+                not exist.
 
             Returns
             -------
@@ -70,7 +68,7 @@ class BaseCog(commands.Cog):
             
             Raises
             ------
-            ValueError:
+            LookupError:
                 the member list data could not be found inside ``guild_data``.
         """
 
@@ -82,7 +80,7 @@ class BaseCog(commands.Cog):
             else guild_data.get("yc_members", {})
         )
         if not isinstance(member_list_data, dict):
-            raise ValueError(f"Could not get members list for '{guild.id}'")
+            raise LookupError(f"Could not get members list for '{guild.id}'")
 
         return member_list_data
 
@@ -101,8 +99,8 @@ class BaseCog(commands.Cog):
             member_list_data: :class:`dict, optional`
                 the data of members in the guild.
             default: :class:`boolean, optional`
-                a truth value determining whether to insert a default value if the data
-                does not exist.
+                a value determining whether to insert a default value if the data does
+                not exist.
 
             Returns
             -------
@@ -111,7 +109,7 @@ class BaseCog(commands.Cog):
             
             Raises
             ------
-            ValueError:
+            LookupError:
                 the guild member's data could not be found inside ``member_list_data``.
         """
 
@@ -124,7 +122,7 @@ class BaseCog(commands.Cog):
             else member_list_data.get(member_id, {})
         )
         if not isinstance(member_data, dict):
-            raise ValueError(f"Could not get member data for '{guild.id}-{member.id}'")
+            raise LookupError(f"Could not get member data for '{guild.id}-{member.id}'")
 
         return member_data
 
@@ -206,6 +204,41 @@ class BaseCog(commands.Cog):
             await message.add_reaction(emoji)  
 
     @staticmethod
+    def command_error_set_resolved(ctx, value):
+        """
+            Attach a value to the context indicating whether a command error has been
+            resolved by a local command error handler.
+
+            Parameters
+            ----------
+            ctx: :class:`discord.Context`
+                the current context for a command sent by a member.
+            value: :class:`bool`
+                a value to attach to the context.
+        """
+
+        ctx.kwargs["resolved_local"] = value
+
+    @staticmethod
+    def command_error_is_resolved(ctx):
+        """
+            Return a value indicating whether a command error has been resolved by a
+            local command error handler.
+
+            Parameters
+            ----------
+            ctx: :class:`discord.Context`
+                the current context for a command sent by a member.
+            
+            Returns
+            -------
+            resolved: :class:`bool`
+                a value indicating whether a command has been resolved locally.
+        """
+
+        return ctx.kwargs.get("resolved_local", False)
+
+    @staticmethod
     def create_embed():
         """
             Return an embed object.
@@ -239,11 +272,13 @@ class BaseCog(commands.Cog):
             
             Raises
             ------
-            InvalidTypeError:
+            discord.BadArgument:
                 the input could not be converted to a positive integer.
         """
-        value = int(input) if input is not None else default
-        # NOTE: Do I really need to raise a custom error, or can I just raise ValueError?
-        if value < 1: raise InvalidTypeError("positive number")
 
-        return value
+        try:
+            value = int(input) if input is not None else default
+            if value < 1: raise ValueError("'input' must be greater than 0")
+            return value
+        except ValueError:
+            raise commands.BadArgument()
