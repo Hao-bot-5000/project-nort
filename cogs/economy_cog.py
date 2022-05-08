@@ -39,7 +39,7 @@ class EconomyCog(BaseCog, name="Economy"):
         yash_coin_values = self.get_yash_coin_values(self.yash_coin_data)
         current_idx = self.get_current_yash_coin_index(len(yash_coin_values))
         current_value = yash_coin_values[current_idx]
-        
+
         embed_reply = self.create_embed()
         embed_reply.set_author(
             name=f"{member.display_name}'s Balance:",
@@ -58,11 +58,11 @@ class EconomyCog(BaseCog, name="Economy"):
         embed_reply.add_field(
             name=f"**Total** {get_emoji(':moneybag:')}",
             value=f"`{nort_bucks + (yash_coins * current_value)} " +
-                  f"({nort_bucks} NRT + {current_value}x{yash_coins} YSH)`", 
+                  f"({nort_bucks} NRT + {current_value}x{yash_coins} YSH)`",
             inline=False
         )
 
-        await ctx.send(embed=embed_reply)
+        await ctx.reply(embed=embed_reply)
 
     ### Stocks Command ###
     @commands.command(
@@ -126,11 +126,11 @@ class EconomyCog(BaseCog, name="Economy"):
 
         if buffer is None:
             embed_reply.set_image(url=self.graph_url)
-            await ctx.send(embed=embed_reply)
+            await ctx.reply(embed=embed_reply)
         else:
             file = discord.File(buffer, filename="plot.png")
             embed_reply.set_image(url="attachment://plot.png")
-            message = await ctx.send(file=file, embed=embed_reply)
+            message = await ctx.reply(file=file, embed=embed_reply)
             self.graph_url = message.embeds[0].image.url
 
 
@@ -146,8 +146,8 @@ class EconomyCog(BaseCog, name="Economy"):
     async def invest(self, ctx, amount: int=1):
         cost = await self.handle_investment(ctx, self.input_to_positive_int(amount))
         if cost is not None:
-            await ctx.send(f"Thank you for investing `{cost}` NortBucks into YashCoin!")
-    
+            await ctx.reply(f"Thank you for investing `{cost}` NortBucks into YashCoin!")
+
     ### Divest Command ###
     @commands.command(
         aliases=["sell"],
@@ -159,7 +159,7 @@ class EconomyCog(BaseCog, name="Economy"):
     async def divest(self, ctx, amount: int=1):
         cost = await self.handle_investment(ctx, -self.input_to_positive_int(amount))
         if cost is not None:
-            await ctx.send(f"You received `{-cost}` NortBucks from selling YashCoins!")
+            await ctx.reply(f"You received `{-cost}` NortBucks from selling YashCoins!")
 
 
 
@@ -174,7 +174,7 @@ class EconomyCog(BaseCog, name="Economy"):
             ----------
             yash_coin_data: :class:`dict`
                 the data on YashCoins.
-            
+
             Returns
             -------
             yash_coin_values: :class:`list`
@@ -204,7 +204,7 @@ class EconomyCog(BaseCog, name="Economy"):
             ----------
             size: :class:`int`
                 the number of times the value of YashCoin changes per day.
-            
+
             Returns
             -------
             index: :class:`int`
@@ -244,7 +244,7 @@ class EconomyCog(BaseCog, name="Economy"):
             upper: :class:`int, optional`
                 the maximum value of ``start`` before ``mu`` is set to ``-sigma`` to
                 slightly prevent the value of YashCoin from further increasing.
-            
+
             Returns
             -------
             yash_coin_values: :class:`list`
@@ -290,7 +290,7 @@ class EconomyCog(BaseCog, name="Economy"):
                 a list of YashCoin values.
             indices: :class:`int`
                 the number of YashCoin values given.
-            
+
             Returns
             -------
             buffer: :class:`io.BytesIO`
@@ -311,7 +311,7 @@ class EconomyCog(BaseCog, name="Economy"):
                 a list of YashCoin values to replace the previous values.
             indices: :class:`int`
                 the number of YashCoin values given.
-            
+
             Returns
             -------
             buffer: :class:`io.BytesIO`
@@ -334,7 +334,7 @@ class EconomyCog(BaseCog, name="Economy"):
                 the initial value of YashCoin.
             end: :class:`int`
                 the final value of YashCoin.
-            
+
             Returns
             -------
             color: :class:`str`
@@ -358,7 +358,7 @@ class EconomyCog(BaseCog, name="Economy"):
                 the current context for a command sent by a member.
             amount: :class:`int`
                 the amount of YashCoins to add to a member's data.
-            
+
             Returns
             -------
             value: :class:`int, None`
@@ -378,15 +378,15 @@ class EconomyCog(BaseCog, name="Economy"):
         value = amount * current_value
 
         if amount > 0 and nort_bucks < value:
-            await ctx.send(
-                f"You do not have the required `{value}` " + 
+            await ctx.reply(
+                f"You do not have the required `{value}` " +
                 "NortBucks to make this investment"
             )
             return None
 
         if amount < 0 and yash_coins < -amount:
-            await ctx.send(
-                f"You do not have the required `{-amount}` " + 
+            await ctx.reply(
+                f"You do not have the required `{-amount}` " +
                 "YashCoins to make this divestment"
             )
             return None

@@ -32,7 +32,7 @@ class StatisticsCog(BaseCog, name="Statistics"):
             f"**Status** `{self.get_cringe_status(percent)}`\n**{percent}%** `{bar}`"
         )
 
-        await ctx.send(embed=embed_reply)
+        await ctx.reply(embed=embed_reply)
 
 
 
@@ -64,7 +64,7 @@ class StatisticsCog(BaseCog, name="Statistics"):
 
         if percent == 69: return "Nice"
         return self.CRINGE_STATUSES[int(percent / 100 * (len(self.CRINGE_STATUSES) - 1))]
-        
+
 
 
 def setup(bot):

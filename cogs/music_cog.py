@@ -16,15 +16,15 @@ class MusicCog(BaseCog, name="Music"):
     @commands.guild_only()
     async def play(self, ctx):
         if ctx.author.voice == None:
-            await ctx.send("You are not in a voice channel")
+            await ctx.reply("You are not in a voice channel")
             return
 
         channel = ctx.author.voice.channel
         try:
             await channel.connect()
-            await ctx.send("playing music")
+            await ctx.reply("playing music")
         except discord.ClientException:
-            await ctx.send("NortBot is in a different voice channel")
+            await ctx.reply("NortBot is in a different voice channel")
 
     @commands.command(
         aliases=["s", "l", "leave"],
@@ -35,17 +35,17 @@ class MusicCog(BaseCog, name="Music"):
     @commands.guild_only()
     async def stop(self, ctx):
         if ctx.voice_client == None:
-            await ctx.send("NortBot is not in a voice channel")
+            await ctx.reply("NortBot is not in a voice channel")
             return
 
         if ctx.author.voice == None:
-            await ctx.send("You are not in a voice channel")
+            await ctx.reply("You are not in a voice channel")
             return
 
         if ctx.voice_client.channel == ctx.author.voice.channel:
             await ctx.voice_client.disconnect()
         else:
-            await ctx.send("NortBot is in a different voice channel")
+            await ctx.reply("NortBot is in a different voice channel")
 
 
 def setup(bot):

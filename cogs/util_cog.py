@@ -10,6 +10,7 @@ class UtilCog(BaseCog, name="Utility"):
     def __init__(self, bot):
         super().__init__(bot)
 
+    # TODO: utilize one of discord.py's HelpCommand classes
     ### Help Command ###
     @commands.command(
         brief="Displays commands",
@@ -20,9 +21,9 @@ class UtilCog(BaseCog, name="Utility"):
     async def help(self, ctx, command: str=None):
 
         try:
-            await ctx.send(self.create_help_message(ctx.author, command))
+            await ctx.reply(self.create_help_message(ctx.author, command))
         except LookupError:
-            await ctx.send(
+            await ctx.reply(
                 f"No command or category called '{command}' found; run " +
                 f"`{self.bot.command_prefix}help` for the list of all " +
                 "available commands and categories"
@@ -48,12 +49,12 @@ class UtilCog(BaseCog, name="Utility"):
         )
 
         self.add_poll_options(embed_reply, message, options, num_options)
-        await self.add_poll_reactions((await ctx.send(embed=embed_reply)), num_options)
+        await self.add_poll_reactions((await ctx.reply(embed=embed_reply)), num_options)
 
     @poll.error
     async def poll_error(self, ctx, error):
         if isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(self.create_sample_poll_message(ctx.guild.owner.display_name))
+            await ctx.reply(self.create_sample_poll_message(ctx.guild.owner.display_name))
         else:
             return
 
@@ -70,7 +71,7 @@ class UtilCog(BaseCog, name="Utility"):
         value = self.input_to_positive_int(value, 100)
         roll = randint(1, value)
 
-        await ctx.send(
+        await ctx.reply(
             f"{get_emoji(':game_die:')} You rolled **{roll}** out of **{value}**!"
         )
 
@@ -85,7 +86,7 @@ class UtilCog(BaseCog, name="Utility"):
         from bot import COGS
         for cog in COGS:
             self.bot.reload_extension(cog)
-        await ctx.send("All commands successfully reloaded!")
+        await ctx.reply("All cogs successfully reloaded!")
 
 
 
@@ -100,7 +101,7 @@ class UtilCog(BaseCog, name="Utility"):
                 a discord member that sent the help command.
             input: :class:`str, optional`
                 the name of a command or cog.
-            
+
             Returns
             -------
             reply: :class:`str`
@@ -112,10 +113,9 @@ class UtilCog(BaseCog, name="Utility"):
                 a command or cog could not be found from ``input``.
         """
 
-        mention = f"{author.mention}\n"
 
         if input is None:
-            return mention + (
+            return (
                 "\n".join(f"**{c.qualified_name}**: {self.cog_get_commands_as_str(c)}"
                           for c in self.bot.cogs.values()) +
 
@@ -128,7 +128,7 @@ class UtilCog(BaseCog, name="Utility"):
 
         command = self.bot.get_command(input)
         if command is not None:
-            return mention + (
+            return (
                 f"\n`{self.bot.command_prefix}{command.name}" +
                 "".join(f" <{p}>" for p in list(command.clean_params.keys())) +
                 f"`: {command.description}" +
@@ -139,9 +139,7 @@ class UtilCog(BaseCog, name="Utility"):
 
         cog = self.bot.get_cog(input)
         if cog is not None:
-            return mention + (
-                f"\n**{cog.qualified_name}**:{self.cog_get_commands_as_str(cog)}"
-            )
+            return f"\n**{cog.qualified_name}**:{self.cog_get_commands_as_str(cog)}"
 
         raise LookupError(f"Could not find a command or cog called '{input}'")
 
