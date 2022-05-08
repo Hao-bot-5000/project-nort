@@ -33,9 +33,9 @@ class QuestsCog(BaseCog, name="Quests"):
             member_data["nort_bucks"] = nort_bucks + 600
             member_data["prev_daily"] = today
 
-            await ctx.send("Daily NortBucks successfully claimed!")
+            await ctx.reply("Daily NortBucks successfully claimed!")
         else:
-            await ctx.send("Daily NortBucks already claimed!")
+            await ctx.reply("Daily NortBucks already claimed!")
 
         set_json_data(self.data_path, self.data)
 
@@ -55,7 +55,7 @@ class QuestsCog(BaseCog, name="Quests"):
         if member_data.get("on_expedition") == 0:
             await self.start_expedition(ctx, member_data, level)
         else:
-            await ctx.send("Currently on expedition!")
+            await ctx.reply("Currently on expedition!")
 
 
 
@@ -77,7 +77,7 @@ class QuestsCog(BaseCog, name="Quests"):
             -------
             quest_data: :class:`dict`
                 a quest's data.
-            
+
             Raises
             ------
             LookupError:
@@ -118,18 +118,18 @@ class QuestsCog(BaseCog, name="Quests"):
         rewards = dict_get_as_list(quest_data, "reward")
 
         if num < 1 or not all(len(l) == num for l in (difficulties, durations, rewards)):
-            await ctx.send("Failed to retrieve quest data...")
+            await ctx.reply("Failed to retrieve quest data...")
             return
 
         if level is None:
             level = difficulties[0]
         elif level not in difficulties:
-            await ctx.send(f"Please input a valid level ({', '.join(difficulties)})")
+            await ctx.reply(f"Please input a valid level ({', '.join(difficulties)})")
             return
 
         member_data["on_expedition"] = 1
         set_json_data(self.data_path, self.data)
-        await ctx.send("Expedition started!")
+        await ctx.reply("Expedition started!")
 
         idx = difficulties.index(level)
         await asyncio.sleep(durations[idx])
@@ -140,9 +140,8 @@ class QuestsCog(BaseCog, name="Quests"):
         member_data["on_expedition"] = 0
 
         set_json_data(self.data_path, self.data)
-        await ctx.send(
-            f"{ctx.author.mention}\nYour expedition has completed, " +
-            f"netting you `{gain}` NortBucks!"
+        await ctx.reply(
+            f"Your expedition has completed, netting you `{gain}` NortBucks!"
         )
 
 

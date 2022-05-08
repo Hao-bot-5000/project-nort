@@ -70,36 +70,36 @@ def main():
             return
 
         if isinstance(error, commands.CommandNotFound):
-            await ctx.send(
+            await ctx.reply(
                 "That command does not exist. For more information, please run " +
                 f"`{bot.command_prefix}help`"
             )
         elif isinstance(error, commands.MissingRequiredArgument):
-            await ctx.send(
+            await ctx.reply(
                 "You have not entered enough arguments. Please run " +
                 f"`{bot.command_prefix}help {ctx.command}` " +
                 "for more information on this command"
             )
         elif isinstance(error, commands.TooManyArguments):
-            await ctx.send(
+            await ctx.reply(
                 "You have entered too many arguments. Please run " +
                 f"`{bot.command_prefix}help {ctx.command}` " +
                 "for more information on this command"
             )
         elif isinstance(error, commands.MemberNotFound):
-            await ctx.send(f"Member {error.argument} could not be found in this server")
+            await ctx.reply(f"Member {error.argument} could not be found in this server")
         elif isinstance(error, commands.BadArgument):
-            await ctx.send(
+            await ctx.reply(
                 "You have entered an invalid argument. Please make sure that your " +
                 "argument is a valid input for this command"
             )
         elif isinstance(error, commands.ArgumentParsingError):
-            await ctx.send(
+            await ctx.reply(
                 "You have entered an improper argument. Please make sure that " +
                 "your arguments are properly formatted"
             )
         else:
-            await ctx.send("Something went wrong...")
+            await ctx.reply("Something went wrong...")
             traceback.print_exception(type(error), error, error.__traceback__)
 
     async def handle_guilds(guild, is_joining):

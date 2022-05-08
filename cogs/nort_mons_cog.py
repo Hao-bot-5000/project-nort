@@ -28,13 +28,13 @@ class NortMonsCog(BaseCog, name="NortMons"):
         member_nort_mon = member_data.get("nort_mon")
 
         if member_nort_mon is not None:
-            await ctx.send("You already own a NortMon")
+            await ctx.reply("You already own a NortMon")
             return
 
         nort_bucks = dict_get_as_int(member_data, "nort_bucks")
 
         if nort_bucks < self.NORT_MON_COST:
-            await ctx.send(
+            await ctx.reply(
                 f"You do not have the required `{self.NORT_MON_COST}` NortBucks to " +
                 "spend on catching a NortMon"
             )
@@ -47,7 +47,7 @@ class NortMonsCog(BaseCog, name="NortMons"):
         member_data["nort_bucks"] = nort_bucks - self.NORT_MON_COST
         set_json_data(self.data_path, self.data)
 
-        await ctx.send(
+        await ctx.reply(
             f"You've spent `{self.NORT_MON_COST}` NortBucks to catch " +
             f"**{nort_mon_name}** — a `{rarity.capitalize()}` NortMon!"
         )
@@ -63,7 +63,7 @@ class NortMonsCog(BaseCog, name="NortMons"):
         member_nort_mon = member_data.get("nort_mon")
 
         if member_nort_mon is None:
-            await ctx.send("You do not own a NortMon")
+            await ctx.reply("You do not own a NortMon")
             return
 
         member_data["nort_mon"] = None
@@ -73,7 +73,7 @@ class NortMonsCog(BaseCog, name="NortMons"):
         nort_mon_data = dict_get_as_list(self.nort_mons_data, rarity)[int(idx)]
         nort_mon_name = nort_mon_data.get("name")
 
-        await ctx.send(
+        await ctx.reply(
             f"You've released your `{rarity.capitalize()}` **{nort_mon_name}**"
         )
 
@@ -91,7 +91,7 @@ class NortMonsCog(BaseCog, name="NortMons"):
         nort_mon_id = member_data.get("nort_mon") # TODO: create dict_get_as_str method?
 
         if nort_mon_id is None:
-            await ctx.send(
+            await ctx.reply(
                 "You do not own a NortMon" if member is ctx.author else
                 f"{member.display_name} does not own a NortMon"
             )
@@ -126,7 +126,7 @@ class NortMonsCog(BaseCog, name="NortMons"):
         )
         embed_reply.set_image(url=image_url)
 
-        await ctx.send(embed=embed_reply)
+        await ctx.reply(embed=embed_reply)
 
 
 
