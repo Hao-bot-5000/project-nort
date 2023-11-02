@@ -398,6 +398,6 @@ class EconomyCog(BaseCog, name="Economy"):
         return value
 
 
-def setup(bot):
-    bot.add_cog(EconomyCog(bot))
+async def setup(bot):
+    await bot.add_cog(EconomyCog(bot))
 

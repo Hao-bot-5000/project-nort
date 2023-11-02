@@ -238,5 +238,5 @@ class UtilCog(BaseCog, name="Utility"):
         await self.add_reactions(message, *self.POLL_EMOJIS[:num_options])
 
 
-def setup(bot):
-    bot.add_cog(UtilCog(bot))
+async def setup(bot):
+    await bot.add_cog(UtilCog(bot))

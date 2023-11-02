@@ -67,5 +67,5 @@ class StatisticsCog(BaseCog, name="Statistics"):
         
 
 
-def setup(bot):
-    bot.add_cog(StatisticsCog(bot))
+async def setup(bot):
+    await bot.add_cog(StatisticsCog(bot))
