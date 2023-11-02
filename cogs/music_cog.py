@@ -48,5 +48,5 @@ class MusicCog(BaseCog, name="Music"):
             await ctx.send("NortBot is in a different voice channel")
 
 
-def setup(bot):
-    bot.add_cog(MusicCog(bot))
+async def setup(bot):
+    await bot.add_cog(MusicCog(bot))

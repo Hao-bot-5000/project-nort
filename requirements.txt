@@ -1,4 +1,4 @@
-aiohttp
+aiohttp==3.9.0b0
 APScheduler
 async-timeout
 chardet
@@ -11,3 +11,4 @@ tzlocal
 websockets
 numpy
 matplotlib
+python-dotenv

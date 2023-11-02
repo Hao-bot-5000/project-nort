@@ -22,7 +22,7 @@ def get_rel_path(*rel_path):
 def get_emoji(emoji_name, fail_silently=False):
     alias = emoji_name if emoji_name[0] == emoji_name[-1] == ":" \
             else f":{emoji_name}:"
-    the_emoji = emojize(alias, use_aliases=True)
+    the_emoji = emojize(alias, language='alias')
 
     if the_emoji == alias and not fail_silently:
         raise ValueError(f"Emoji {alias} not found!")

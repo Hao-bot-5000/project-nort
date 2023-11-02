@@ -1,3 +1,4 @@
+import asyncio
 import os
 import sys
 import traceback
@@ -28,16 +29,11 @@ COGS = [f"cogs.{filename[:-3]}" for filename in os.listdir("./cogs")
 
 #########################################################################################
 
-def main():
+async def main():
     # Initialize the bot
     print("Starting up...")
     bot = commands.Bot(intents=intents, command_prefix=settings.COMMAND_PREFIX,
                        help_command=None)
-
-    # Load up all available cogs
-    print(f"List of cogs: {COGS}")
-    for cog in COGS:
-        bot.load_extension(cog)
 
     # Define event handlers for the bot
     # on_ready may be called multiple times in the event of a reconnect,
@@ -56,7 +52,7 @@ def main():
                   activity=discord.Game(name=settings.NOW_PLAYING))
         print("Logged in!", flush=True)
 
-    # NOTE: This event seems to not get triggered if an error is caught (by discord.py)
+    # NOTE: This event seems to not get triggered if an error is caught (by discord.py) -- check if still case on discord.py v2.x
     # before the command function is even invoked.
     @bot.before_invoke
     async def print_command_in_console(ctx):
@@ -121,11 +117,17 @@ def main():
     async def on_guild_remove(guild):
         await handle_guilds(guild, is_joining=False)
 
-    # Finally, set the bot running
-    bot.run(settings.BOT_TOKEN)
+    async with bot:
+        # Load up all available cogs
+        print(f"List of cogs: {COGS}")
+        for cog in COGS:
+            await bot.load_extension(cog)
+
+        # Finally, set the bot running
+        await bot.start(settings.BOT_TOKEN)
 
 #########################################################################################
 
 
 if __name__ == "__main__":
-    main()
+    asyncio.run(main())

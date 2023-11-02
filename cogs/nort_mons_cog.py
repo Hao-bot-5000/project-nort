@@ -153,5 +153,5 @@ class NortMonsCog(BaseCog, name="NortMons"):
                 return (nort_mon_name, f"{rarity}-{rand_idx}")
 
 
-def setup(bot):
-    bot.add_cog(NortMonsCog(bot))
+async def setup(bot):
+    await bot.add_cog(NortMonsCog(bot))
